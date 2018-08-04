@@ -1,19 +1,11 @@
 package pomeranian
 
-import akka.actor.{ ActorRef, ActorSystem }
+import akka.actor.ActorSystem
 import akka.event.Logging
-import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
-import akka.http.scaladsl.server.directives.MethodDirectives.{ delete, get, post }
-import akka.http.scaladsl.server.directives.PathDirectives.path
-import akka.http.scaladsl.server.directives.RouteDirectives.complete
-import akka.pattern.ask
 import akka.util.Timeout
-import pomeranian.UserRegistryActor._
-import pomeranian.routes.AuthorizationRoute
-
-import scala.concurrent.Future
+import pomeranian.routes.{ AuthorizationRoute, VideoRoute }
 import scala.concurrent.duration._
 
 trait RoutesHandler extends JsonSupport {
@@ -28,7 +20,8 @@ trait RoutesHandler extends JsonSupport {
 
   //#all-routes
   lazy val authorizationRoute = new AuthorizationRoute()
+  lazy val videoRoute = new VideoRoute()
 
-  lazy val routes: Route = authorizationRoute.route
+  lazy val routes: Route = authorizationRoute.route ~ videoRoute.route
   //#all-routes
 }
