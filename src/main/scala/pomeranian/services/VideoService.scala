@@ -3,14 +3,12 @@ package pomeranian.services
 import java.nio.file.Paths
 
 import akka.actor.ActorSystem
-import akka.http.scaladsl.server.Directives.{ fileUpload, onSuccess }
 import akka.http.scaladsl.server.directives.FileInfo
-import akka.http.scaladsl.server.directives.RouteDirectives.complete
 import akka.stream.{ ActorMaterializer, IOResult }
 import akka.stream.scaladsl.{ FileIO, Source }
 import akka.util.ByteString
 import pomeranian.models.VideoInfo
-import pomeranian.utils.PredefinedPath
+import pomeranian.repositories.VideoRepository
 
 import scala.concurrent.Future
 import scala.util.{ Failure, Success }
@@ -32,9 +30,11 @@ class VideoServiceImpl extends VideoService {
     val sink = FileIO.toPath(path1)
     val future = fileStream.runWith(sink)
 
+    VideoRepository.createVideo(VideoInfo("alala", "asd"))
+
     future.map { res: IOResult =>
       res.status match {
-        case Success(_) => VideoInfo("thisiskey")
+        case Success(_) => VideoInfo("thisiskey", "title")
         case Failure(e) => throw e
       }
     }

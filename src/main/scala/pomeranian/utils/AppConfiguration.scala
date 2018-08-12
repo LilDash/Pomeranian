@@ -12,6 +12,9 @@ object AppConfiguration {
   val httpsPort = httpConfig.getInt("httpsPort")
   val useHttps = httpConfig.getBoolean("useHttps")
 
+  // CORS
+  val corsConfig = config.getConfig("akka-http-cors")
+
   // Mysql
   private val mysqlConfig = config.getConfig("mysql")
   val mysqlDriver = mysqlConfig.getString("driver")
@@ -23,4 +26,15 @@ object AppConfiguration {
   val mysqlIncrementalConnections = mysqlConfig.getInt("incrementalConnections")
   val mysqlGetConnectionSleepTime = mysqlConfig.getInt("sleepTime")
 
+  // OSS
+  private val ossConfig = config.getConfig("oss")
+  val ossEndpoint = ossConfig.getString("endpoint")
+  val ossAccessId = ossConfig.getString("accessId")
+  val ossAccessKey = ossConfig.getString("accessKey")
+  val ossBucket = ossConfig.getString("bucket")
+
+  // Upload
+  private val uploadConfig = config.getConfig("upload")
+  val uploadFileMaxLength = uploadConfig.getInt("fileMaxLength")
+  val uploadPolicyExpireTime = uploadConfig.getInt("uploadPolicyExpireTime")
 }

@@ -20,8 +20,9 @@ lazy val root = (project in file(".")).
       "org.scalatest"     %% "scalatest"            % "3.0.1"         % Test,
 
       "mysql"             % "mysql-connector-java"  % "8.0.11",
-      "com.typesafe"      % "config"                % "1.3.0"
-
+      "com.typesafe"      % "config"                % "1.3.0",
+      "com.aliyun.oss"    % "aliyun-sdk-oss"        % "3.1.0",
+      "ch.megard"         %% "akka-http-cors"       % "0.3.0"
     )
 
 )
