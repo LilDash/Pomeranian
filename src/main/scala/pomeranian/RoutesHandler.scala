@@ -4,13 +4,12 @@ import akka.actor.ActorSystem
 import akka.event.Logging
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives._
-import akka.http.scaladsl.server.{RejectionHandler, Route}
+import akka.http.scaladsl.server.{ RejectionHandler, Route }
 import akka.util.Timeout
 import ch.megard.akka.http.cors.javadsl.CorsRejection
 import ch.megard.akka.http.cors.scaladsl.CorsDirectives._
 import ch.megard.akka.http.cors.scaladsl.settings.CorsSettings
-import com.typesafe.config.ConfigFactory
-import pomeranian.routes.{AuthorizationRoute, UploadRoute, VideoRoute}
+import pomeranian.routes.{ AuthorizationRoute, UploadRoute, VideoRoute }
 import pomeranian.utils.AppConfiguration
 
 import scala.concurrent.duration._
@@ -30,17 +29,17 @@ trait RoutesHandler extends JsonSupport {
   implicit def rejectionHandler =
     RejectionHandler.newBuilder()
       .handleAll[CorsRejection] { _ =>
-      complete(StatusCodes.Forbidden, s"Cross origin access is forbidden")
-    }.result()
+        complete(StatusCodes.Forbidden, s"Cross origin access is forbidden")
+      }.result()
 
   //#all-routes
   lazy val authorizationRoute = new AuthorizationRoute()
   lazy val videoRoute = new VideoRoute()
-  lazy val mediaRoute = new UploadRoute()
+  lazy val uploadRoute = new UploadRoute()
 
   // routes allow CORS
   val corsRoute = cors(corsSetting) {
-    authorizationRoute.route ~ videoRoute.route ~ mediaRoute.route
+    authorizationRoute.route ~ uploadRoute.route
   }
 
   lazy val routes: Route = {

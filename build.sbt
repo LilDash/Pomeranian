@@ -4,8 +4,9 @@ lazy val akkaVersion    = "2.5.14"
 lazy val root = (project in file(".")).
   settings(
     inThisBuild(List(
-      organization    := "dashfu",
+      organization    := "cleyuan",
       scalaVersion    := "2.12.6"
+//      version         := "0.1.0-SNAPSHOT",
     )),
     name := "pomeranian",
     libraryDependencies ++= Seq(
@@ -20,9 +21,15 @@ lazy val root = (project in file(".")).
       "org.scalatest"     %% "scalatest"            % "3.0.1"         % Test,
 
       "mysql"             % "mysql-connector-java"  % "8.0.11",
+
+      "com.typesafe.slick" %% "slick"               % "3.2.3",
+      "org.slf4j"         % "slf4j-nop"             % "1.6.4",
+      "com.typesafe.slick" %% "slick-hikaricp"      % "3.2.3",
+
       "com.typesafe"      % "config"                % "1.3.0",
       "com.aliyun.oss"    % "aliyun-sdk-oss"        % "3.1.0",
       "ch.megard"         %% "akka-http-cors"       % "0.3.0"
     )
 
 )
+enablePlugins(JavaServerAppPackaging)

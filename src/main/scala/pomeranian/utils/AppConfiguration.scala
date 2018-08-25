@@ -26,6 +26,10 @@ object AppConfiguration {
   val mysqlIncrementalConnections = mysqlConfig.getInt("incrementalConnections")
   val mysqlGetConnectionSleepTime = mysqlConfig.getInt("sleepTime")
 
+  // Database
+  private val dbConfig = config.getConfig("db")
+  val dbMysqlConfig = dbConfig.getConfig("mysql")
+
   // OSS
   private val ossConfig = config.getConfig("oss")
   val ossEndpoint = ossConfig.getString("endpoint")

@@ -6,7 +6,7 @@ import com.aliyun.oss.{ClientConfiguration, OSSClient}
 import com.aliyun.oss.common.auth.CredentialsProviderFactory
 import com.aliyun.oss.common.utils.BinaryUtil
 import com.aliyun.oss.model.{MatchMode, PolicyConditions}
-import pomeranian.models.{CallbackParams, OssJsonProtocol, UploadPolicy}
+import pomeranian.models._
 import pomeranian.utils.{AppConfiguration, HashingUtil}
 import spray.json._
 
@@ -15,17 +15,17 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 trait OssService {
   //def GetStsToken()
-  def GetUploadPolicy(): Future[UploadPolicy];
+  def getUploadPolicy(): Future[OssUploadPolicy];
 }
 class OssServiceImpl extends OssService with OssJsonProtocol{
 
-  override def GetUploadPolicy(): Future[UploadPolicy] = {
+  override def getUploadPolicy(): Future[OssUploadPolicy] = {
 
     val accessId = AppConfiguration.ossAccessId
     val accessKey = AppConfiguration.ossAccessKey
     val bucket = AppConfiguration.ossBucket
     val endpoint = AppConfiguration.ossEndpoint
-    val key = newKey()
+    val key = newKey("video/") // TODO:  pass prefix from outside
     val host = s"http://$bucket.$endpoint"
     val callbackUrl = getCallbackUrl()
 
@@ -34,13 +34,12 @@ class OssServiceImpl extends OssService with OssJsonProtocol{
 
     Future {
       try {
-        val callbackParams = CallbackParams(
+        val callbackParams = OssCallbackParams(
           callbackUrl,
           "filename=${object}&size=${size}&mimeType=${mimeType}&height=${imageInfo.height}&width=${imageInfo.width}",
           "application/x-www-form-urlencoded"
         )
-        val encoder = Base64.getEncoder()
-        val base64CallbackBody = encoder.encode(callbackParams.toJson.toString.getBytes).toString
+        val base64CallbackBody = Base64.getEncoder().encodeToString(callbackParams.toJson.toString.getBytes)
 
         val expireEndTime = System.currentTimeMillis() + AppConfiguration.uploadPolicyExpireTime * 1000
         val expiration = new Date(expireEndTime)
@@ -55,7 +54,7 @@ class OssServiceImpl extends OssService with OssJsonProtocol{
         val encodedPolicy = BinaryUtil.toBase64String(binaryData)
         val postSignature = client.calculatePostSignature(postPolicy)
 
-        val uploadPolicy = UploadPolicy(
+        val uploadPolicy = OssUploadPolicy(
           accessId,
           encodedPolicy,
           postSignature,
@@ -83,14 +82,16 @@ class OssServiceImpl extends OssService with OssJsonProtocol{
         val port = AppConfiguration.httpPort
         s"http://$host.$port"
       }
+
+      "http://callback.oss-demo.com:23450"
   }
 
-  private def newKey(): String = {
+  private def newKey(prefix: String): String = {
     val random = scala.util.Random
     val randomNumber = random.nextInt(10000)
     val time = System.currentTimeMillis()
     val str = s"$time$randomNumber"
-    val prefix = HashingUtil.md5(str).substring(1, 6)
-    s"$prefix$str"
+    val fileNamePrefix = HashingUtil.md5(str).substring(1, 6)
+    s"$prefix$fileNamePrefix$str"
   }
 }

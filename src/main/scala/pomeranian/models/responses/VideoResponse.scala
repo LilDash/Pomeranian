@@ -1,7 +1,7 @@
 package pomeranian.models.responses
 
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
-import pomeranian.models.{ VideoInfo, VideoJsonProtocol }
+import pomeranian.models.video.{VideoInfo, VideoJsonProtocol}
 
 case class UploadVideoResponse(
   errCode: Int,
