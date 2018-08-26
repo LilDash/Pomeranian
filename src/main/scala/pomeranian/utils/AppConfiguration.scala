@@ -15,17 +15,6 @@ object AppConfiguration {
   // CORS
   val corsConfig = config.getConfig("akka-http-cors")
 
-  // Mysql
-  private val mysqlConfig = config.getConfig("mysql")
-  val mysqlDriver = mysqlConfig.getString("driver")
-  val mysqlUrl = mysqlConfig.getString("url")
-  val mysqlUsername = mysqlConfig.getString("username")
-  val mysqlPassword = mysqlConfig.getString("password")
-  val mysqlMaxConnections = mysqlConfig.getInt("maxConnections")
-  val mysqlInitialConnections = mysqlConfig.getInt("initialConnections")
-  val mysqlIncrementalConnections = mysqlConfig.getInt("incrementalConnections")
-  val mysqlGetConnectionSleepTime = mysqlConfig.getInt("sleepTime")
-
   // Database
   private val dbConfig = config.getConfig("db")
   val dbMysqlConfig = dbConfig.getConfig("mysql")

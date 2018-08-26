@@ -1,7 +1,7 @@
 package pomeranian.services
 
 import pomeranian.constants.Global
-import pomeranian.models.video.{VideoReview, VideoReviewResult}
+import pomeranian.models.video.{VideoReview, VideoReviewDetail, VideoReviewResult}
 import pomeranian.repositories.VideoReviewRepository
 import pomeranian.utils.TimeUtil
 
@@ -9,6 +9,7 @@ import scala.concurrent.Future
 
 trait VideoReviewService {
   def createVideoReview(videoId: Long): Future[Long]
+  def getPendingVideoReview(offset: Long, num: Int): Future[Seq[Any]]
 }
 
 class VideoReviewServiceImpl extends VideoReviewService {
@@ -20,5 +21,9 @@ class VideoReviewServiceImpl extends VideoReviewService {
                                   0, VideoReviewResult.Pending, Global.DbRecActive,
                                   timeStamp, timeStamp)
     VideoReviewRepository.insert(videoReview)
+  }
+
+  override def getPendingVideoReview(offset: Long, num: Int): Future[Seq[VideoReviewDetail]] = {
+    VideoReviewRepository.fetchPending(offset,num)
   }
 }
