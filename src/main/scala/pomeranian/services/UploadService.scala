@@ -1,9 +1,9 @@
 package pomeranian.services
 
-import javax.activation.{MimeType, MimeTypeParseException}
+import javax.activation.{ MimeType, MimeTypeParseException }
 
 import pomeranian.models.video.VideoInfo
-import pomeranian.models.{OssUploadPolicy, UploadNotification}
+import pomeranian.models.{ OssUploadPolicy, UploadNotification }
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -31,11 +31,11 @@ class UploadServiceImpl extends UploadService {
               notification.title, mimeType.getBaseType, notification.size, "")
             val videoService = new VideoServiceImpl
             videoService.createVideo(videoInfo).flatMap {
-                case 0 => Future.successful(0)
-                case videoId =>
-                  val videoReviewService = new VideoReviewServiceImpl()
-                  videoReviewService.createVideoReview(videoId)
-                  Future.successful(videoId)
+              case 0 => Future.successful(0)
+              case videoId =>
+                val videoReviewService = new VideoReviewServiceImpl()
+                videoReviewService.createVideoReview(videoId)
+                Future.successful(videoId)
             }
           case _ =>
             throw new UnsupportedOperationException("Unsupported MimeType")

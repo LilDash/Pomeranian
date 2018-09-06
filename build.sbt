@@ -28,7 +28,10 @@ lazy val root = (project in file(".")).
 
       "com.typesafe"      % "config"                % "1.3.0",
       "com.aliyun.oss"    % "aliyun-sdk-oss"        % "3.1.0",
-      "ch.megard"         %% "akka-http-cors"       % "0.3.0"
+      "ch.megard"         %% "akka-http-cors"       % "0.3.0",
+//      "com.nulab-inc"     %% "scala-oauth2-core"    % "1.3.0",
+//      "com.nulab-inc"     %% "akka-http-oauth2-provider" % "1.3.0",
+      "io.igl"            %% "jwt"                  % "1.2.2"
     )
 
 )

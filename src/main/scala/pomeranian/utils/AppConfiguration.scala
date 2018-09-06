@@ -30,4 +30,11 @@ object AppConfiguration {
   private val uploadConfig = config.getConfig("upload")
   val uploadFileMaxLength = uploadConfig.getInt("fileMaxLength")
   val uploadPolicyExpireTime = uploadConfig.getInt("uploadPolicyExpireTime")
+
+  // Authorization
+  private val authConfig = config.getConfig("auth")
+  val authType = authConfig.getString("type")
+  val authAlg = authConfig.getString("algorithm")
+  val authSecretKey = authConfig.getString("secretKey")
+  val authValidTime = authConfig.getInt("validTime")
 }

@@ -9,7 +9,7 @@ import akka.util.Timeout
 import ch.megard.akka.http.cors.javadsl.CorsRejection
 import ch.megard.akka.http.cors.scaladsl.CorsDirectives._
 import ch.megard.akka.http.cors.scaladsl.settings.CorsSettings
-import pomeranian.routes.{ AuthorizationRoute, UploadRoute, VideoRoute }
+import pomeranian.routes.{ AuthRoute, UploadRoute, VideoRoute }
 import pomeranian.utils.AppConfiguration
 
 import scala.concurrent.duration._
@@ -33,7 +33,7 @@ trait RoutesHandler extends JsonSupport {
       }.result()
 
   //#all-routes
-  lazy val authorizationRoute = new AuthorizationRoute()
+  lazy val authorizationRoute = new AuthRoute()
   lazy val videoRoute = new VideoRoute()
   lazy val uploadRoute = new UploadRoute()
 

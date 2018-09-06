@@ -5,20 +5,21 @@ import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.server.directives.RouteDirectives.complete
 import pomeranian.constants.ErrorCode
-import pomeranian.models.responses.{GetVideoReviewPendingResponse, UploadVideoResponse, VideoResponseJsonProtocol}
-import pomeranian.models.video.VideoInfo
-import pomeranian.services.{VideoReviewServiceImpl, VideoServiceImpl}
+import pomeranian.models.responses.{GetVideoReviewPendingResponse, VideoResponseJsonProtocol}
+import pomeranian.models.security.Role
+import pomeranian.services.VideoReviewServiceImpl
 
 import scala.util.{Failure, Success}
 
-class VideoRoute extends VideoResponseJsonProtocol {
+class VideoRoute extends BaseRoute with VideoResponseJsonProtocol {
 
   val route: Route = {
     val version = "1"
     val numPerPage = 10
 
     pathPrefix("video") {
-        pathPrefix("review") {
+      pathPrefix("review") {
+        authorizeAsync(hasPermission(Role.Admin)) {
           path("pending") {
             pathEnd {
               get {
@@ -32,6 +33,7 @@ class VideoRoute extends VideoResponseJsonProtocol {
                       complete(StatusCodes.OK, response)
                     case Failure(_) =>
                       // TODO: log
+
                       complete(StatusCodes.InternalServerError)
                   }
                 }
@@ -39,6 +41,7 @@ class VideoRoute extends VideoResponseJsonProtocol {
             }
           }
         }
+      }
     }
   }
 }

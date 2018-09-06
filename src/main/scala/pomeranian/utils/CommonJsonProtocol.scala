@@ -2,7 +2,7 @@ package pomeranian.utils
 
 import java.sql.Timestamp
 
-import spray.json.{DefaultJsonProtocol, DeserializationException, JsNumber, JsValue, RootJsonFormat}
+import spray.json.{ DefaultJsonProtocol, DeserializationException, JsNumber, JsValue, RootJsonFormat }
 
 trait CommonJsonProtocol extends DefaultJsonProtocol {
 

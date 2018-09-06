@@ -1,10 +1,13 @@
 package pomeranian.utils
 
 import java.sql.Timestamp
-import java.util.Calendar
 
 object TimeUtil {
   def timeStamp(): Timestamp = {
-    new Timestamp(Calendar.getInstance.getTime.getTime)
+    new Timestamp(System.currentTimeMillis)
+  }
+
+  def now(): Long = {
+    System.currentTimeMillis
   }
 }

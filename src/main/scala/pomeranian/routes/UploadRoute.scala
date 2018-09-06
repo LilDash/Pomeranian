@@ -1,6 +1,6 @@
 package pomeranian.routes
 
-import akka.http.scaladsl.model.{ StatusCodes }
+import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.server.directives.RouteDirectives.complete
@@ -11,10 +11,12 @@ import pomeranian.services.UploadServiceImpl
 
 import scala.util.{ Failure, Success }
 
-class UploadRoute extends UploadResponseJsonProtocol {
+class UploadRoute extends BaseRoute with UploadResponseJsonProtocol {
+
+  val version = "1"
 
   val route: Route = {
-    val version = "1"
+
 
     pathPrefix("upload") {
       path("policy") {
