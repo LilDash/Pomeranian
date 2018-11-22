@@ -4,12 +4,12 @@ import akka.actor.ActorSystem
 import akka.event.Logging
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives._
-import akka.http.scaladsl.server.{ RejectionHandler, Route }
+import akka.http.scaladsl.server.{RejectionHandler, Route}
 import akka.util.Timeout
 import ch.megard.akka.http.cors.javadsl.CorsRejection
 import ch.megard.akka.http.cors.scaladsl.CorsDirectives._
 import ch.megard.akka.http.cors.scaladsl.settings.CorsSettings
-import pomeranian.routes.{ AuthRoute, UploadRoute, VideoRoute }
+import pomeranian.routes._
 import pomeranian.utils.AppConfiguration
 
 import scala.concurrent.duration._
@@ -36,10 +36,16 @@ trait RoutesHandler extends JsonSupport {
   lazy val authorizationRoute = new AuthRoute()
   lazy val videoRoute = new VideoRoute()
   lazy val uploadRoute = new UploadRoute()
+  lazy val tripRoute = new TripRoute()
+  lazy val geoRoute = new GeoRoute()
 
   // routes allow CORS
   val corsRoute = cors(corsSetting) {
-    authorizationRoute.route ~ videoRoute.route ~ uploadRoute.route
+    authorizationRoute.route ~
+      videoRoute.route ~
+      uploadRoute.route ~
+      tripRoute.route ~
+      geoRoute.route
   }
 
   lazy val routes: Route = {
