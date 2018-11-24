@@ -35,11 +35,12 @@ class TripServiceImpl extends  TripService {
     } else if (departureCountryId > 0 && arrivalCountryId > 0) {
       TripRepository.fetchTripsByDepartureCountryAndArrivalCountry(departureCountryId, arrivalCountryId, offset, num)
     } else {
-      throw new InvalidParameterException(s"Invalid parameters - " +
-        s"departureCountryId: $departureCountryId " +
-        s"departureCityId: $departureCityId " +
-        s"arrivalCountryId: $arrivalCountryId " +
-        s"arrivalCityId: $arrivalCityId")
+      TripRepository.fetchAllTrips(offset, num)
+//      throw new InvalidParameterException(s"Invalid parameters - " +
+//        s"departureCountryId: $departureCountryId " +
+//        s"departureCityId: $departureCityId " +
+//        s"arrivalCountryId: $arrivalCountryId " +
+//        s"arrivalCityId: $arrivalCityId")
     }
   }
 

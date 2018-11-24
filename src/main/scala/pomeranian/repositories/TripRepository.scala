@@ -10,6 +10,8 @@ import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
 trait TripRepository {
+  def fetchAllTrips(offset: Int, num: Int): Future[Seq[TripInfo]]
+
   def fetchTripsByDepartureCityAndArrivalCity(
     departureCityId: Int,
     arrivalCityId: Int,
@@ -41,6 +43,25 @@ object TripRepository extends TripRepository {
   val trip = TableQuery[TripTableDef]
   val country = TableQuery[CountryTableDef]
   val city = TableQuery[CityTableDef];
+
+  override def fetchAllTrips(offset: Int, num: Int): Future[Seq[TripInfo]] = {
+    val selectedTrips = trip.filter(_.recStatus === Global.DbRecActive)
+      .sortBy { t => t.id.desc }
+      .drop(offset).take(num)
+    val query = (for {
+      ((_, depCity), depCountry) <- (selectedTrips join city on (_.departureCityId === _.id)) join country on (_._2.countryId === _.id)
+      ((t, arrCity), arrCountry) <- (selectedTrips join city on (_.arrivalCityId === _.id)) join country on (_._2.countryId === _.id)
+    } yield (t, depCity, depCountry, arrCity, arrCountry)).result.map { rows =>
+      rows.collect {
+        case (t, depCity, depCountry, arrCity, arrCountry) =>
+          TripInfo(t.id, t.userId, "", "", t.departureCityId, depCity.displayName, depCountry.id, depCountry.displayName,
+            t.arrivalCityId, arrCity.displayName, arrCountry.id, arrCountry.displayName, t.flightNumber, t.totalCapacity,
+            t.remainingCapacity, t.capacityPrice, t.currency, t.departureTime, t.pickupTime,
+            t.memo, t.recCreatedWhen)
+      }
+    }
+    db.run(query)
+  }
 
   override def fetchTripsByDepartureCityAndArrivalCity(departureCityId: Int,
                                                    arrivalCityId: Int,
