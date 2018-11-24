@@ -13,28 +13,48 @@ trait TripRepository {
   def fetchAllTrips(offset: Int, num: Int): Future[Seq[TripInfo]]
 
   def fetchTripsByDepartureCityAndArrivalCity(
-    departureCityId: Int,
-    arrivalCityId: Int,
-    offset: Int,
-    num: Int): Future[Seq[TripInfo]]
+                                    departureCityId: Int,
+                                    arrivalCityId: Int,
+                                    offset: Int,
+                                    num: Int): Future[Seq[TripInfo]]
 
   def fetchTripsByDepartureCountryAndArrivalCity(
-    departureCountryId: Int,
-    arrivalCityId: Int,
-    offset: Int,
-    num: Int): Future[Seq[TripInfo]]
+                                    departureCountryId: Int,
+                                    arrivalCityId: Int,
+                                    offset: Int,
+                                    num: Int): Future[Seq[TripInfo]]
 
   def fetchTripsByDepartureCityAndArrivalCountry(
-    departureCityId: Int,
-    arrivalCountryId: Int,
-    offset: Int,
-    num: Int): Future[Seq[TripInfo]]
+                                    departureCityId: Int,
+                                    arrivalCountryId: Int,
+                                    offset: Int,
+                                    num: Int): Future[Seq[TripInfo]]
 
   def fetchTripsByDepartureCountryAndArrivalCountry(
-    departureCountryId: Int,
-    arrivalCountryId: Int,
-    offset: Int,
-    num: Int): Future[Seq[TripInfo]]
+                                    departureCountryId: Int,
+                                    arrivalCountryId: Int,
+                                    offset: Int,
+                                    num: Int): Future[Seq[TripInfo]]
+
+  def fetchTripsByDepartureCountry(
+                                    departureCountryId: Int,
+                                    offset: Int,
+                                    num: Int): Future[Seq[TripInfo]]
+
+  def fetchTripsByDepartureCity(
+                                    departureCityId: Int,
+                                    offset: Int,
+                                    num: Int): Future[Seq[TripInfo]]
+
+  def fetchTripsByArrivalCountry(
+                                 arrivalCountryId: Int,
+                                 offset: Int,
+                                 num: Int): Future[Seq[TripInfo]]
+
+  def fetchTripsByArrivalCity(
+                                 arrivalCityId: Int,
+                                 offset: Int,
+                                 num: Int): Future[Seq[TripInfo]]
 }
 
 object TripRepository extends TripRepository {
@@ -45,15 +65,14 @@ object TripRepository extends TripRepository {
   val city = TableQuery[CityTableDef];
 
   override def fetchAllTrips(offset: Int, num: Int): Future[Seq[TripInfo]] = {
-    val selectedTrips = trip.filter(_.recStatus === Global.DbRecActive)
-      .sortBy { t => t.id.desc }
+    val join1 = (trip join city on (_.departureCityId === _.id)) join country on (_._2.countryId === _.id)
+    val join2 = (join1 join city on (_._1._1.arrivalCityId === _.id)) join country on (_._2.countryId === _.id)
+    val query = join2.filter(_._1._1._1._1.recStatus === Global.DbRecActive)
+      .sortBy { t => t._1._1._1._1.id.desc }
       .drop(offset).take(num)
-    val query = (for {
-      ((_, depCity), depCountry) <- (selectedTrips join city on (_.departureCityId === _.id)) join country on (_._2.countryId === _.id)
-      ((t, arrCity), arrCountry) <- (selectedTrips join city on (_.arrivalCityId === _.id)) join country on (_._2.countryId === _.id)
-    } yield (t, depCity, depCountry, arrCity, arrCountry)).result.map { rows =>
+      .result.map { rows =>
       rows.collect {
-        case (t, depCity, depCountry, arrCity, arrCountry) =>
+        case ((((t, depCity), depCountry), arrCity), arrCountry) =>
           TripInfo(t.id, t.userId, "", "", t.departureCityId, depCity.displayName, depCountry.id, depCountry.displayName,
             t.arrivalCityId, arrCity.displayName, arrCountry.id, arrCountry.displayName, t.flightNumber, t.totalCapacity,
             t.remainingCapacity, t.capacityPrice, t.currency, t.departureTime, t.pickupTime,
@@ -67,17 +86,16 @@ object TripRepository extends TripRepository {
                                                    arrivalCityId: Int,
                                                    offset: Int,
                                                    num: Int): Future[Seq[TripInfo]] = {
+
     val selectedTrips = trip.filter(_.departureCityId === departureCityId)
       .filter(_.arrivalCityId === arrivalCityId)
       .filter(_.recStatus === Global.DbRecActive)
-      .sortBy { t => t.id.desc }
-      .drop(offset).take(num)
-    val query = (for {
-      ((_, depCity), depCountry) <- (selectedTrips join city on (_.departureCityId === _.id)) join country on (_._2.countryId === _.id)
-      ((t, arrCity), arrCountry) <- (selectedTrips join city on (_.arrivalCityId === _.id)) join country on (_._2.countryId === _.id)
-    } yield (t, depCity, depCountry, arrCity, arrCountry)).result.map { rows =>
+    val join1 = (selectedTrips join city on (_.departureCityId === _.id)) join country on (_._2.countryId === _.id)
+    val join2 = (join1 join city on (_._1._1.arrivalCityId === _.id)) join country on (_._2.countryId === _.id)
+    val query = join2.sortBy { t => t._1._1._1._1.id.desc }
+      .drop(offset).take(num).result.map { rows =>
       rows.collect {
-        case (t, depCity, depCountry, arrCity, arrCountry) =>
+        case ((((t, depCity), depCountry), arrCity), arrCountry) =>
           TripInfo(t.id, t.userId, "", "", t.departureCityId, depCity.displayName, depCountry.id, depCountry.displayName,
             t.arrivalCityId, arrCity.displayName, arrCountry.id, arrCountry.displayName, t.flightNumber, t.totalCapacity,
             t.remainingCapacity, t.capacityPrice, t.currency, t.departureTime, t.pickupTime,
@@ -95,12 +113,12 @@ object TripRepository extends TripRepository {
     val selectedTrips = trip.filter(_.arrivalCityId === arrivalCityId)
       .filter(_.recStatus === Global.DbRecActive)
     val selectedDepartureCountry = country.filter(_.id === departureCountryId)
-    val query = (for {
-      ((_, depCity), depCountry) <- (selectedTrips join city on (_.departureCityId === _.id)) join selectedDepartureCountry on (_._2.countryId === _.id)
-      ((t, arrCity), arrCountry) <- (selectedTrips join city on (_.arrivalCityId === _.id)) join country on (_._2.countryId === _.id)
-    } yield (t, depCity, depCountry, arrCity, arrCountry)).result.map { rows =>
+    val join1 = (selectedTrips join city on (_.departureCityId === _.id)) join selectedDepartureCountry on (_._2.countryId === _.id)
+    val join2 = (join1 join city on (_._1._1.arrivalCityId === _.id)) join country on (_._2.countryId === _.id)
+    val query = join2.sortBy { t => t._1._1._1._1.id.desc }
+      .drop(offset).take(num).result.map { rows =>
       rows.collect {
-        case (t, depCity, depCountry, arrCity, arrCountry) =>
+        case ((((t, depCity), depCountry), arrCity), arrCountry) =>
           TripInfo(t.id, t.userId, "", "", t.departureCityId, depCity.displayName, depCountry.id, depCountry.displayName,
             t.arrivalCityId, arrCity.displayName, arrCountry.id, arrCountry.displayName, t.flightNumber, t.totalCapacity,
             t.remainingCapacity, t.capacityPrice, t.currency, t.departureTime, t.pickupTime,
@@ -118,16 +136,16 @@ object TripRepository extends TripRepository {
     val selectedTrips = trip.filter(_.departureCityId === departureCityId)
       .filter(_.recStatus === Global.DbRecActive)
     val selectedArrivalCountry = country.filter(_.id === arrivalCountryId)
-    val query = (for {
-      ((_, depCity), depCountry) <- (selectedTrips join city on (_.departureCityId === _.id)) join country on (_._2.countryId === _.id)
-      ((t, arrCity), arrCountry) <- (selectedTrips join city on (_.arrivalCityId === _.id)) join selectedArrivalCountry on (_._2.countryId === _.id)
-    } yield (t, depCity, depCountry, arrCity, arrCountry)).result.map { rows =>
-      rows.collect {
-        case (t, depCity, depCountry, arrCity, arrCountry) =>
-          TripInfo(t.id, t.userId, "", "", t.departureCityId, depCity.displayName, depCountry.id, depCountry.displayName,
-            t.arrivalCityId, arrCity.displayName, arrCountry.id, arrCountry.displayName, t.flightNumber, t.totalCapacity,
-            t.remainingCapacity, t.capacityPrice, t.currency, t.departureTime, t.pickupTime,
-            t.memo, t.recCreatedWhen)
+    val join1 = (selectedTrips join city on (_.departureCityId === _.id)) join country on (_._2.countryId === _.id)
+    val join2 = (join1 join city on (_._1._1.arrivalCityId === _.id)) join selectedArrivalCountry on (_._2.countryId === _.id)
+    val query = join2.sortBy { t => t._1._1._1._1.id.desc }
+        .drop(offset).take(num).result.map { rows =>
+        rows.collect {
+          case ((((t, depCity), depCountry), arrCity), arrCountry) =>
+            TripInfo(t.id, t.userId, "", "", t.departureCityId, depCity.displayName, depCountry.id, depCountry.displayName,
+              t.arrivalCityId, arrCity.displayName, arrCountry.id, arrCountry.displayName, t.flightNumber, t.totalCapacity,
+              t.remainingCapacity, t.capacityPrice, t.currency, t.departureTime, t.pickupTime,
+              t.memo, t.recCreatedWhen)
       }
     }
     db.run(query)
@@ -140,12 +158,12 @@ object TripRepository extends TripRepository {
     val selectedTrips = trip.filter(_.recStatus === Global.DbRecActive)
     val selectedDepCountry = country.filter(_.id === departureCountryId)
     val selectedArrCountry = country.filter(_.id === arrivalCountryId)
-    val query = (for {
-      ((_, depCity), depCountry) <- (selectedTrips join city on (_.departureCityId === _.id)) join selectedDepCountry on (_._2.countryId === _.id)
-      ((t, arrCity), arrCountry) <- (selectedTrips join city on (_.arrivalCityId === _.id)) join selectedArrCountry on (_._2.countryId === _.id)
-    } yield (t, depCity, depCountry, arrCity, arrCountry)).result.map { rows =>
+    val join1 = (selectedTrips join city on (_.departureCityId === _.id)) join selectedDepCountry on (_._2.countryId === _.id)
+    val join2 = (join1 join city on (_._1._1.arrivalCityId === _.id)) join selectedArrCountry on (_._2.countryId === _.id)
+    val query = join2.sortBy { t => t._1._1._1._1.id.desc }
+      .drop(offset).take(num).result.map { rows =>
       rows.collect {
-        case (t, depCity, depCountry, arrCity, arrCountry) =>
+        case ((((t, depCity), depCountry), arrCity), arrCountry) =>
           TripInfo(t.id, t.userId, "", "", t.departureCityId, depCity.displayName, depCountry.id, depCountry.displayName,
             t.arrivalCityId, arrCity.displayName, arrCountry.id, arrCountry.displayName, t.flightNumber, t.totalCapacity,
             t.remainingCapacity, t.capacityPrice, t.currency, t.departureTime, t.pickupTime,
@@ -154,4 +172,89 @@ object TripRepository extends TripRepository {
     }
     db.run(query)
   }
+
+  override def fetchTripsByDepartureCountry(
+                                    departureCountryId: Int,
+                                    offset: Int,
+                                    num: Int): Future[Seq[TripInfo]] = {
+    val selectedTrips = trip.filter(_.recStatus === Global.DbRecActive)
+    val selectedDepartureCountry = country.filter(_.id === departureCountryId)
+    val join1 = (selectedTrips join city on (_.departureCityId === _.id)) join selectedDepartureCountry on (_._2.countryId === _.id)
+    val join2 = (join1 join city on (_._1._1.arrivalCityId === _.id)) join country on (_._2.countryId === _.id)
+    val query = join2.sortBy { t => t._1._1._1._1.id.desc }
+      .drop(offset).take(num).result.map { rows =>
+      rows.collect {
+        case ((((t, depCity), depCountry), arrCity), arrCountry) =>
+          TripInfo(t.id, t.userId, "", "", t.departureCityId, depCity.displayName, depCountry.id, depCountry.displayName,
+            t.arrivalCityId, arrCity.displayName, arrCountry.id, arrCountry.displayName, t.flightNumber, t.totalCapacity,
+            t.remainingCapacity, t.capacityPrice, t.currency, t.departureTime, t.pickupTime,
+            t.memo, t.recCreatedWhen)
+      }
+    }
+    db.run(query)
+  }
+
+  override def fetchTripsByDepartureCity(
+                                 departureCityId: Int,
+                                 offset: Int,
+                                 num: Int): Future[Seq[TripInfo]] = {
+    val selectedTrips = trip.filter(_.departureCityId === departureCityId)
+      .filter(_.recStatus === Global.DbRecActive)
+    val join1 = (selectedTrips join city on (_.departureCityId === _.id)) join country on (_._2.countryId === _.id)
+    val join2 = (join1 join city on (_._1._1.arrivalCityId === _.id)) join country on (_._2.countryId === _.id)
+    val query = join2.sortBy { t => t._1._1._1._1.id.desc }
+      .drop(offset).take(num).result.map { rows =>
+      rows.collect {
+        case ((((t, depCity), depCountry), arrCity), arrCountry) =>
+          TripInfo(t.id, t.userId, "", "", t.departureCityId, depCity.displayName, depCountry.id, depCountry.displayName,
+            t.arrivalCityId, arrCity.displayName, arrCountry.id, arrCountry.displayName, t.flightNumber, t.totalCapacity,
+            t.remainingCapacity, t.capacityPrice, t.currency, t.departureTime, t.pickupTime,
+            t.memo, t.recCreatedWhen)
+      }
+    }
+    db.run(query)
+  }
+
+  override def fetchTripsByArrivalCountry(
+                                  arrivalCountryId: Int,
+                                  offset: Int,
+                                  num: Int): Future[Seq[TripInfo]] = {
+    val selectedTrips = trip.filter(_.recStatus === Global.DbRecActive)
+    val selectedArrCountry = country.filter(_.id === arrivalCountryId)
+    val join1 = (selectedTrips join city on (_.departureCityId === _.id)) join country on (_._2.countryId === _.id)
+    val join2 = (join1 join city on (_._1._1.arrivalCityId === _.id)) join selectedArrCountry on (_._2.countryId === _.id)
+    val query = join2.sortBy { t => t._1._1._1._1.id.desc }
+      .drop(offset).take(num).result.map { rows =>
+      rows.collect {
+        case ((((t, depCity), depCountry), arrCity), arrCountry) =>
+          TripInfo(t.id, t.userId, "", "", t.departureCityId, depCity.displayName, depCountry.id, depCountry.displayName,
+            t.arrivalCityId, arrCity.displayName, arrCountry.id, arrCountry.displayName, t.flightNumber, t.totalCapacity,
+            t.remainingCapacity, t.capacityPrice, t.currency, t.departureTime, t.pickupTime,
+            t.memo, t.recCreatedWhen)
+      }
+    }
+    db.run(query)
+  }
+
+  override def fetchTripsByArrivalCity(
+                               arrivalCityId: Int,
+                               offset: Int,
+                               num: Int): Future[Seq[TripInfo]] = {
+    val selectedTrips = trip.filter(_.arrivalCityId === arrivalCityId)
+      .filter(_.recStatus === Global.DbRecActive)
+    val join1 = (selectedTrips join city on (_.departureCityId === _.id)) join country on (_._2.countryId === _.id)
+    val join2 = (join1 join city on (_._1._1.arrivalCityId === _.id)) join country on (_._2.countryId === _.id)
+    val query = join2.sortBy { t => t._1._1._1._1.id.desc }
+      .drop(offset).take(num).result.map { rows =>
+      rows.collect {
+        case ((((t, depCity), depCountry), arrCity), arrCountry) =>
+          TripInfo(t.id, t.userId, "", "", t.departureCityId, depCity.displayName, depCountry.id, depCountry.displayName,
+            t.arrivalCityId, arrCity.displayName, arrCountry.id, arrCountry.displayName, t.flightNumber, t.totalCapacity,
+            t.remainingCapacity, t.capacityPrice, t.currency, t.departureTime, t.pickupTime,
+            t.memo, t.recCreatedWhen)
+      }
+    }
+    db.run(query)
+  }
+
 }
