@@ -10,6 +10,8 @@ import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
 trait TripRepository {
+  def fetchTripById(id: Int): Future[Option[TripInfo]]
+
   def fetchAllTrips(offset: Int, num: Int): Future[Seq[TripInfo]]
 
   def fetchTripsByDepartureCityAndArrivalCity(
@@ -63,6 +65,22 @@ object TripRepository extends TripRepository {
   val trip = TableQuery[TripTableDef]
   val country = TableQuery[CountryTableDef]
   val city = TableQuery[CityTableDef];
+
+  override def fetchTripById(id: Int): Future[Option[TripInfo]] = {
+    val selectedTrips = trip.filter(_.id === id)
+    val join1 = (selectedTrips join city on (_.departureCityId === _.id)) join country on (_._2.countryId === _.id)
+    val join2 = (join1 join city on (_._1._1.arrivalCityId === _.id)) join country on (_._2.countryId === _.id)
+    val query = join2.result.headOption.map { rows =>
+        rows.collect {
+          case ((((t, depCity), depCountry), arrCity), arrCountry) =>
+            TripInfo(t.id, t.userId, "", "", t.departureCityId, depCity.displayName, depCountry.id, depCountry.displayName,
+              t.arrivalCityId, arrCity.displayName, arrCountry.id, arrCountry.displayName, t.flightNumber, t.totalCapacity,
+              t.remainingCapacity, t.capacityPrice, t.currency, t.departureTime, t.pickupTime,
+              t.memo, t.recCreatedWhen)
+        }
+      }
+    db.run(query)
+  }
 
   override def fetchAllTrips(offset: Int, num: Int): Future[Seq[TripInfo]] = {
     val join1 = (trip join city on (_.departureCityId === _.id)) join country on (_._2.countryId === _.id)

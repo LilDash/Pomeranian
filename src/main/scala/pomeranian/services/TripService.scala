@@ -8,16 +8,22 @@ import pomeranian.repositories.TripRepository
 import scala.concurrent.Future
 
 trait TripService {
+  def getTripById(id: Int): Future[Option[TripInfo]]
   def searchTripsByLocation(
                              departureCountryId: Int,
                              departureCityId: Int,
                              arrivalCountryId: Int,
                              arrivalCityId: Int,
                              offset: Int,
-                             num: Int): Future[Any]
+                             num: Int): Future[Seq[TripInfo]]
 }
 
 class TripServiceImpl extends  TripService {
+
+  override def getTripById(id: Int): Future[Option[TripInfo]] = {
+    TripRepository.fetchTripById(id)
+  }
+
   override def searchTripsByLocation(
                                       departureCountryId: Int,
                                       departureCityId: Int,
