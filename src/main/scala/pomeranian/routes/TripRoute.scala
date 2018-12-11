@@ -24,7 +24,7 @@ class TripRoute extends BaseRoute with TripResponseJsonProtocol {
         pathEnd {
           get {
             parameters('id.as[Int]) { (tripId) =>
-              val futureResult = tripService.getTripById(tripId)
+              val futureResult = tripService.getTripDetailById(tripId)
               onComplete(futureResult) {
                 case Success(result) =>
                   if (result.isDefined) {

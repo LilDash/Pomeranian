@@ -3,6 +3,7 @@ package pomeranian.models.trip
 import java.sql.Timestamp
 
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
+import pomeranian.models.user._
 import pomeranian.utils.CommonJsonProtocol
 
 final case class Trip (
@@ -26,8 +27,6 @@ final case class Trip (
 final case class TripInfo (
   id: Int,
   userId: Int,
-  nickname: String,
-  avatar: String,
   departureCityId: Int,
   departureCityName: String,
   departureCountryId: Int,
@@ -47,6 +46,22 @@ final case class TripInfo (
   recCreatedWhen: Timestamp,
 )
 
-trait TripJsonProtocal extends SprayJsonSupport with CommonJsonProtocol {
-  implicit val tripInfoFormat = jsonFormat21(TripInfo)
+final case class TripSummary (
+                             tripInfo: TripInfo,
+                             userInfo: UserInfo,
+                             )
+
+final case class TripDetail (
+                            tripInfo: TripInfo,
+                            userInfo: UserInfo,
+                            userContactInfo: Seq[UserContactInfo],
+                            )
+
+trait TripJsonProtocol extends SprayJsonSupport
+  with UserJsonProtocol
+  with UserContactJsonProtocol
+  with CommonJsonProtocol {
+  implicit val tripInfoFormat = jsonFormat19(TripInfo)
+  implicit val tripSummaryFormat = jsonFormat2(TripSummary)
+  implicit val tripDetailFormat = jsonFormat3(TripDetail)
 }
