@@ -2,7 +2,7 @@ package pomeranian.services
 
 import java.security.InvalidParameterException
 
-import pomeranian.models.trip.{TripDetail, TripInfo, TripSummary}
+import pomeranian.models.trip.{Trip, TripDetail, TripInfo, TripSummary}
 import pomeranian.models.user.{User, UserContactInfo, UserInfo}
 import pomeranian.repositories.{TripRepository, UserRepository}
 
@@ -19,6 +19,7 @@ trait TripService {
                              arrivalCityId: Int,
                              offset: Int,
                              num: Int): Future[Seq[TripSummary]]
+  def createTrip(trip: Trip): Future[Int]
 }
 
 class TripServiceImpl extends  TripService {
@@ -104,5 +105,22 @@ class TripServiceImpl extends  TripService {
       Await.result(Future.sequence(Seq(futureUserInfo, futureUserContactInfo)), Duration.Inf)
 
     TripDetail(tripInfo, result(0).asInstanceOf[UserInfo], result(1).asInstanceOf[Seq[UserContactInfo]])
+  }
+
+  override def createTrip(trip: Trip): Future[Int] = {
+    if (trip.departureCityId == 0 || trip.arrivalCityId == 0 || trip.departureCityId == trip.arrivalCityId) {
+      throw new InvalidParameterException("Invalid departure city and arrival city")
+    }
+    if (trip.departureTime.after(trip.pickupTime)) {
+      throw new InvalidParameterException("Invalid departure time and pickup time")
+    }
+    if (!"^[0-9a-zA-Z]+$".r.pattern.matcher(trip.flightNumber).matches()){
+      throw new InvalidParameterException("Invalid flight number")
+    }
+    if (trip.memo.size > 200) {
+      throw new InvalidParameterException("Illegal length of memo")
+    }
+
+    TripRepository.insert(trip)
   }
 }

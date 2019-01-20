@@ -9,4 +9,5 @@ object ErrorCode {
 
   // 3000 ~ 3999 for trip error
   val TripNotFound = 3000
+  val CreateTripFailed = 3001
 }

@@ -2,10 +2,11 @@ package pomeranian.repositories
 
 import pomeranian.constants.Global
 import pomeranian.models.geo.{CityTableDef, CountryTableDef}
-import pomeranian.models.trip.{TripInfo, TripTableDef}
+import pomeranian.models.trip.{Trip, TripInfo, TripTableDef}
 import pomeranian.utils.database.MySqlDbConnection
 import slick.lifted.TableQuery
 import slick.jdbc.MySQLProfile.api._
+
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -57,6 +58,8 @@ trait TripRepository {
                                  arrivalCityId: Int,
                                  offset: Int,
                                  num: Int): Future[Seq[TripInfo]]
+
+  def insert(t: Trip): Future[Int]
 }
 
 object TripRepository extends TripRepository {
@@ -273,6 +276,16 @@ object TripRepository extends TripRepository {
       }
     }
     db.run(query)
+  }
+
+  override def insert(t: Trip): Future[Int] = {
+    val action = (trip returning trip.map(_.id)) += t
+    db.run(action).map(tripId =>
+      tripId).recover {
+      case ex: Exception =>
+        //Logger.error(ex.getCause.getMessage())
+        0
+    }
   }
 
 }

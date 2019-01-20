@@ -16,7 +16,15 @@ case class GetTripsResponse (
   version: String,
   data: Seq[TripSummary]) extends BaseResponse(errCode, errMsg, version)
 
+case class PublishTripResponse (
+                               errCode: Int,
+                               errMsg: String,
+                               version: String,
+                               data: Map[String, Int]
+                               )
+
 trait TripResponseJsonProtocol extends SprayJsonSupport with TripJsonProtocol {
   implicit val getTripDetailResponseFormat = jsonFormat4(GetTripDetailResponse)
   implicit val getTripsResponseFormat = jsonFormat4(GetTripsResponse)
+  implicit val publishTripResponseFormat = jsonFormat4(PublishTripResponse)
 }
