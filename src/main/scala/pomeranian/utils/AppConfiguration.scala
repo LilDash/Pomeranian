@@ -37,4 +37,9 @@ object AppConfiguration {
   val authAlg = authConfig.getString("algorithm")
   val authSecretKey = authConfig.getString("secretKey")
   val authValidTime = authConfig.getInt("validTime")
+
+  // WeChat
+  private val wechatConfig = config.getConfig("wechat")
+  val wechatAppId = wechatConfig.getString("appid")
+  val wechatSecret = wechatConfig.getString("secret")
 }

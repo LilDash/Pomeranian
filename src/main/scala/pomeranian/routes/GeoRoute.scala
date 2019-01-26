@@ -11,6 +11,7 @@ import pomeranian.services.LocationServiceImpl
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.Success
+import scala.util.Failure
 
 
 class GeoRoute extends BaseRoute with GeoResponseJsonProtocol {
@@ -29,6 +30,9 @@ class GeoRoute extends BaseRoute with GeoResponseJsonProtocol {
                 case Success(result) =>
                   val response = GetCountryCitiesResponse(ErrorCode.Ok, "", version, result)
                   complete(StatusCodes.OK, response)
+                case Failure(_) =>
+                  // TODO : Log
+                  complete(StatusCodes.InternalServerError)
               }
             }
           }

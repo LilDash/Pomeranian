@@ -38,6 +38,7 @@ trait RoutesHandler extends JsonSupport {
   lazy val uploadRoute = new UploadRoute()
   lazy val tripRoute = new TripRoute()
   lazy val geoRoute = new GeoRoute()
+  lazy val userRoute = new UserRoute()
 
   // routes allow CORS
   val corsRoute = cors(corsSetting) {
@@ -45,7 +46,8 @@ trait RoutesHandler extends JsonSupport {
       videoRoute.route ~
       uploadRoute.route ~
       tripRoute.route ~
-      geoRoute.route
+      geoRoute.route ~
+      userRoute.route
   }
 
   lazy val routes: Route = {
