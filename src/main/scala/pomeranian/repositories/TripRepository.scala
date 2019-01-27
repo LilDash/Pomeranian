@@ -78,7 +78,7 @@ object TripRepository extends TripRepository {
           case ((((t, depCity), depCountry), arrCity), arrCountry) =>
             TripInfo(t.id, t.userId, t.departureCityId, depCity.displayName, depCountry.id, depCountry.displayName,
               t.arrivalCityId, arrCity.displayName, arrCountry.id, arrCountry.displayName, t.flightNumber, t.totalCapacity,
-              t.remainingCapacity, t.capacityPrice, t.currency, t.departureTime, t.pickupTime,
+              t.remainingCapacity, t.capacityPrice, t.currency, t.departureTime, t.pickupTime, t.contactTypeId, t.contactValue,
               t.memo, t.recCreatedWhen)
         }
       }
@@ -96,7 +96,7 @@ object TripRepository extends TripRepository {
         case ((((t, depCity), depCountry), arrCity), arrCountry) =>
           TripInfo(t.id, t.userId, t.departureCityId, depCity.displayName, depCountry.id, depCountry.displayName,
             t.arrivalCityId, arrCity.displayName, arrCountry.id, arrCountry.displayName, t.flightNumber, t.totalCapacity,
-            t.remainingCapacity, t.capacityPrice, t.currency, t.departureTime, t.pickupTime,
+            t.remainingCapacity, t.capacityPrice, t.currency, t.departureTime, t.pickupTime, t.contactTypeId, t.contactValue,
             t.memo, t.recCreatedWhen)
       }
     }
@@ -119,7 +119,7 @@ object TripRepository extends TripRepository {
         case ((((t, depCity), depCountry), arrCity), arrCountry) =>
           TripInfo(t.id, t.userId, t.departureCityId, depCity.displayName, depCountry.id, depCountry.displayName,
             t.arrivalCityId, arrCity.displayName, arrCountry.id, arrCountry.displayName, t.flightNumber, t.totalCapacity,
-            t.remainingCapacity, t.capacityPrice, t.currency, t.departureTime, t.pickupTime,
+            t.remainingCapacity, t.capacityPrice, t.currency, t.departureTime, t.pickupTime, t.contactTypeId, t.contactValue,
             t.memo, t.recCreatedWhen)
       }
     }
@@ -142,7 +142,7 @@ object TripRepository extends TripRepository {
         case ((((t, depCity), depCountry), arrCity), arrCountry) =>
           TripInfo(t.id, t.userId, t.departureCityId, depCity.displayName, depCountry.id, depCountry.displayName,
             t.arrivalCityId, arrCity.displayName, arrCountry.id, arrCountry.displayName, t.flightNumber, t.totalCapacity,
-            t.remainingCapacity, t.capacityPrice, t.currency, t.departureTime, t.pickupTime,
+            t.remainingCapacity, t.capacityPrice, t.currency, t.departureTime, t.pickupTime, t.contactTypeId, t.contactValue,
             t.memo, t.recCreatedWhen)
       }
     }
@@ -165,7 +165,7 @@ object TripRepository extends TripRepository {
           case ((((t, depCity), depCountry), arrCity), arrCountry) =>
             TripInfo(t.id, t.userId, t.departureCityId, depCity.displayName, depCountry.id, depCountry.displayName,
               t.arrivalCityId, arrCity.displayName, arrCountry.id, arrCountry.displayName, t.flightNumber, t.totalCapacity,
-              t.remainingCapacity, t.capacityPrice, t.currency, t.departureTime, t.pickupTime,
+              t.remainingCapacity, t.capacityPrice, t.currency, t.departureTime, t.pickupTime, t.contactTypeId, t.contactValue,
               t.memo, t.recCreatedWhen)
       }
     }
@@ -187,7 +187,7 @@ object TripRepository extends TripRepository {
         case ((((t, depCity), depCountry), arrCity), arrCountry) =>
           TripInfo(t.id, t.userId, t.departureCityId, depCity.displayName, depCountry.id, depCountry.displayName,
             t.arrivalCityId, arrCity.displayName, arrCountry.id, arrCountry.displayName, t.flightNumber, t.totalCapacity,
-            t.remainingCapacity, t.capacityPrice, t.currency, t.departureTime, t.pickupTime,
+            t.remainingCapacity, t.capacityPrice, t.currency, t.departureTime, t.pickupTime, t.contactTypeId, t.contactValue,
             t.memo, t.recCreatedWhen)
       }
     }
@@ -208,7 +208,7 @@ object TripRepository extends TripRepository {
         case ((((t, depCity), depCountry), arrCity), arrCountry) =>
           TripInfo(t.id, t.userId, t.departureCityId, depCity.displayName, depCountry.id, depCountry.displayName,
             t.arrivalCityId, arrCity.displayName, arrCountry.id, arrCountry.displayName, t.flightNumber, t.totalCapacity,
-            t.remainingCapacity, t.capacityPrice, t.currency, t.departureTime, t.pickupTime,
+            t.remainingCapacity, t.capacityPrice, t.currency, t.departureTime, t.pickupTime, t.contactTypeId, t.contactValue,
             t.memo, t.recCreatedWhen)
       }
     }
@@ -229,7 +229,7 @@ object TripRepository extends TripRepository {
         case ((((t, depCity), depCountry), arrCity), arrCountry) =>
           TripInfo(t.id, t.userId, t.departureCityId, depCity.displayName, depCountry.id, depCountry.displayName,
             t.arrivalCityId, arrCity.displayName, arrCountry.id, arrCountry.displayName, t.flightNumber, t.totalCapacity,
-            t.remainingCapacity, t.capacityPrice, t.currency, t.departureTime, t.pickupTime,
+            t.remainingCapacity, t.capacityPrice, t.currency, t.departureTime, t.pickupTime, t.contactTypeId, t.contactValue,
             t.memo, t.recCreatedWhen)
       }
     }
@@ -250,7 +250,7 @@ object TripRepository extends TripRepository {
         case ((((t, depCity), depCountry), arrCity), arrCountry) =>
           TripInfo(t.id, t.userId, t.departureCityId, depCity.displayName, depCountry.id, depCountry.displayName,
             t.arrivalCityId, arrCity.displayName, arrCountry.id, arrCountry.displayName, t.flightNumber, t.totalCapacity,
-            t.remainingCapacity, t.capacityPrice, t.currency, t.departureTime, t.pickupTime,
+            t.remainingCapacity, t.capacityPrice, t.currency, t.departureTime, t.pickupTime, t.contactTypeId, t.contactValue,
             t.memo, t.recCreatedWhen)
       }
     }
@@ -271,7 +271,7 @@ object TripRepository extends TripRepository {
         case ((((t, depCity), depCountry), arrCity), arrCountry) =>
           TripInfo(t.id, t.userId, t.departureCityId, depCity.displayName, depCountry.id, depCountry.displayName,
             t.arrivalCityId, arrCity.displayName, arrCountry.id, arrCountry.displayName, t.flightNumber, t.totalCapacity,
-            t.remainingCapacity, t.capacityPrice, t.currency, t.departureTime, t.pickupTime,
+            t.remainingCapacity, t.capacityPrice, t.currency, t.departureTime, t.pickupTime, t.contactTypeId, t.contactValue,
             t.memo, t.recCreatedWhen)
       }
     }

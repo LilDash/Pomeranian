@@ -7,43 +7,47 @@ import pomeranian.models.user._
 import pomeranian.utils.CommonJsonProtocol
 
 final case class Trip (
-  id: Int,
-  userId: Int,
-  departureCityId: Int,
-  arrivalCityId: Int,
-  flightNumber: String,
-  totalCapacity: Int,
-  remainingCapacity: Int,
-  capacityPrice: Float,
-  currency: String,
-  departureTime: Timestamp,
-  pickupTime: Timestamp,
-  memo: Option[String],
-  recStatus: Int,
-  recCreatedWhen: Timestamp,
-  recUpdatedWhen: Timestamp,
+                        id: Int,
+                        userId: Int,
+                        departureCityId: Int,
+                        arrivalCityId: Int,
+                        flightNumber: String,
+                        totalCapacity: Int,
+                        remainingCapacity: Int,
+                        capacityPrice: Float,
+                        currency: String,
+                        departureTime: Timestamp,
+                        pickupTime: Timestamp,
+                        contactTypeId: Int,
+                        contactValue: String,
+                        memo: Option[String],
+                        recStatus: Int,
+                        recCreatedWhen: Timestamp,
+                        recUpdatedWhen: Timestamp,
 )
 
 final case class TripInfo (
-  id: Int,
-  userId: Int,
-  departureCityId: Int,
-  departureCityName: String,
-  departureCountryId: Int,
-  departureCountryName: String,
-  arrivalCityId: Int,
-  arrivalCityName: String,
-  arrivalCountryId: Int,
-  arrivalCountryName: String,
-  flightNumber: String,
-  totalCapacity: Int,
-  remainingCapacity: Int,
-  capacityPrice: Float,
-  currency: String,
-  departureTime: Timestamp,
-  pickupTime: Timestamp,
-  memo: Option[String],
-  recCreatedWhen: Timestamp,
+                            id: Int,
+                            userId: Int,
+                            departureCityId: Int,
+                            departureCityName: String,
+                            departureCountryId: Int,
+                            departureCountryName: String,
+                            arrivalCityId: Int,
+                            arrivalCityName: String,
+                            arrivalCountryId: Int,
+                            arrivalCountryName: String,
+                            flightNumber: String,
+                            totalCapacity: Int,
+                            remainingCapacity: Int,
+                            capacityPrice: Float,
+                            currency: String,
+                            departureTime: Timestamp,
+                            pickupTime: Timestamp,
+                            contactTypeId: Int,
+                            contactValue: String,
+                            memo: Option[String],
+                            recCreatedWhen: Timestamp,
 )
 
 final case class TripSummary (
@@ -54,14 +58,13 @@ final case class TripSummary (
 final case class TripDetail (
                             tripInfo: TripInfo,
                             userInfo: UserInfo,
-                            userContactInfo: Seq[UserContactInfo],
                             )
 
 trait TripJsonProtocol extends SprayJsonSupport
   with UserJsonProtocol
   with UserContactJsonProtocol
   with CommonJsonProtocol {
-  implicit val tripInfoFormat = jsonFormat19(TripInfo)
+  implicit val tripInfoFormat = jsonFormat21(TripInfo)
   implicit val tripSummaryFormat = jsonFormat2(TripSummary)
-  implicit val tripDetailFormat = jsonFormat3(TripDetail)
+  implicit val tripDetailFormat = jsonFormat2(TripDetail)
 }

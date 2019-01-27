@@ -32,8 +32,14 @@ final case class UserContactInfo (
                                   contactTypeValue: String,
                                   )
 
+case class ContactTypePair (
+                             contactTypeId: Int,
+                             contactValue: String,
+                           )
+
 trait UserContactJsonProtocol extends SprayJsonSupport with CommonJsonProtocol {
   implicit val contactTypeFormat = jsonFormat6(ContactType)
   implicit val userContactFormat = jsonFormat7(UserContact)
   implicit val userContactInfoFormat = jsonFormat5(UserContactInfo)
+  implicit val contactTypePairFormat = jsonFormat2(ContactTypePair)
 }

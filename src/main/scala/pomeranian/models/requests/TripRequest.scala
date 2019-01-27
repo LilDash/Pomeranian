@@ -4,6 +4,7 @@ import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import pomeranian.utils.CommonJsonProtocol
 
 case class PublishTripRequest (
+                                userId: Int,
                                 depCityId: Int,
                                 arrCityId: Int,
                                 depTime: Long,
@@ -12,9 +13,11 @@ case class PublishTripRequest (
                                 capacityPrice: Int,
                                 totalCapacity: Int,
                                 remainingCapacity: Int,
+                                contactTypeId: Int,
+                                contactValue: String,
                                 memo: String
                                )
 
 trait TripRequestJsonProtocol extends SprayJsonSupport with CommonJsonProtocol{
-  implicit val publishTripRequestFormat = jsonFormat9(PublishTripRequest)
+  implicit val publishTripRequestFormat = jsonFormat12(PublishTripRequest)
 }

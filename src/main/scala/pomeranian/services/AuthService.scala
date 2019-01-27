@@ -27,16 +27,15 @@ class AuthServiceImpl extends AuthService {
         userService.findUserByAuthType(AuthType.WeChatMiniProgram, weChatUserInfo.openId).flatMap {
           case userInfo: Some[UserInfo] =>
             val u = userInfo.get
-            val resultInfo = MiniProgramLoginResultInfo(u.id, u.username, u.nickname, u.avatar, weChatUserInfo.openId)
+            val resultInfo = MiniProgramLoginResultInfo(u.id, u.username, u.nickname, u.avatar, u.rating, u.tripsNum, weChatUserInfo.openId)
             Future.successful(MiniProgramLoginResult(LoginResultStatus.Success, Option(resultInfo)))
           case None =>
-            // TODO: User not exist, then create new account for it
             val time = TimeUtil.timeStamp()
             val user = User(0, weChatUserInfo.openId, weChatUserInfo.nickName, 0, 0,
               Option(weChatUserInfo.avatarUrl), Global.DbRecActive, time, time)
             UserRepository.insertUserWithBinding(AuthType.WeChatMiniProgram, weChatUserInfo.openId, user).map { userId =>
               val resultInfo = MiniProgramLoginResultInfo(userId, weChatUserInfo.openId,
-                weChatUserInfo.nickName, Option(weChatUserInfo.avatarUrl), weChatUserInfo.openId)
+                weChatUserInfo.nickName, Option(weChatUserInfo.avatarUrl), user.rating, user.tripsNum, weChatUserInfo.openId)
               MiniProgramLoginResult(LoginResultStatus.Success, Option(resultInfo))
             }.recover {
               case e =>

@@ -9,6 +9,8 @@ trait LoginResultInfoBase {
   def username: String;
   def nickname: String;
   def avatar: Option[String];
+  def rating: Int;
+  def tripsNum: Int;
 }
 
 trait LoginResultBase {
@@ -21,6 +23,8 @@ final case class MiniProgramLoginResultInfo(
                                              username: String,
                                              nickname: String,
                                              avatar: Option[String],
+                                             rating: Int,
+                                             tripsNum: Int,
                                              openId: String,
                                            ) extends LoginResultInfoBase
 
@@ -30,6 +34,6 @@ final case class MiniProgramLoginResult(
                                        ) extends LoginResultBase
 
 trait LoginResultJsonProtocol extends SprayJsonSupport with CommonJsonProtocol {
-  implicit val miniProgramLoginResultInfoResponseFormat = jsonFormat5(MiniProgramLoginResultInfo)
+  implicit val miniProgramLoginResultInfoResponseFormat = jsonFormat7(MiniProgramLoginResultInfo)
   implicit val miniProgramLoginResultResponseFormat = jsonFormat2(MiniProgramLoginResult)
 }

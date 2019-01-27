@@ -17,6 +17,8 @@ class TripTableDef(tag: Tag) extends Table[Trip](tag, "trip") {
   def currency = column[String]("currency")
   def departureTime = column[Timestamp]("departure_time")
   def pickupTime = column[Timestamp]("pickup_time")
+  def contactTypeId = column[Int]("contact_type_id")
+  def contactValue = column[String]("contact_value")
   def memo = column[Option[String]]("memo")
   def recStatus = column[Int]("rec_status")
   def recCreatedWhen = column[Timestamp]("rec_created_when")
@@ -34,6 +36,8 @@ class TripTableDef(tag: Tag) extends Table[Trip](tag, "trip") {
     currency,
     departureTime,
     pickupTime,
+    contactTypeId,
+    contactValue,
     memo,
     recStatus,
     recCreatedWhen,

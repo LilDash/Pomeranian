@@ -2,9 +2,11 @@ package pomeranian.services
 
 import java.security.InvalidParameterException
 
+import pomeranian.constants.ErrorCode
 import pomeranian.models.trip.{Trip, TripDetail, TripInfo, TripSummary}
 import pomeranian.models.user.{User, UserContactInfo, UserInfo}
 import pomeranian.repositories.{TripRepository, UserRepository}
+import pomeranian.constants.{ContactType => ConstantContactType}
 
 import scala.concurrent.{Await, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -99,12 +101,17 @@ class TripServiceImpl extends  TripService {
         UserInfo(0, "", "", 0, 0, None)
     }
 
-    val futureUserContactInfo = UserRepository.fetchUserContactInfo(tripInfo.userId)
+//    val futureUserContactInfo = UserRepository.fetchUserContactInfo(tripInfo.userId)
+//
+//    val result =
+//      Await.result(Future.sequence(Seq(futureUserInfo, futureUserContactInfo)), Duration.Inf)
+//
+//    TripDetail(tripInfo, result(0).asInstanceOf[UserInfo], result(1).asInstanceOf[Seq[UserContactInfo]])
 
     val result =
-      Await.result(Future.sequence(Seq(futureUserInfo, futureUserContactInfo)), Duration.Inf)
+      Await.result(Future.sequence(Seq(futureUserInfo)), Duration.Inf)
 
-    TripDetail(tripInfo, result(0).asInstanceOf[UserInfo], result(1).asInstanceOf[Seq[UserContactInfo]])
+    TripDetail(tripInfo, result(0))
   }
 
   override def createTrip(trip: Trip): Future[Int] = {
@@ -117,10 +124,16 @@ class TripServiceImpl extends  TripService {
     if (!"^[0-9a-zA-Z]+$".r.pattern.matcher(trip.flightNumber).matches()){
       throw new InvalidParameterException("Invalid flight number")
     }
+    val availableContactTypeId = List(ConstantContactType.WeChatId) // support wechat only for now
+    if (!availableContactTypeId.contains(trip.contactTypeId)) {
+      throw new InvalidParameterException("Invalid contact type")
+    }
+    if (!"^[-_0-9a-zA-Z]+$".r.pattern.matcher(trip.contactValue).matches()){
+      throw new InvalidParameterException("Invalid contact value")
+    }
     if (trip.memo.size > 200) {
       throw new InvalidParameterException("Illegal length of memo")
     }
-
     TripRepository.insert(trip)
   }
 }

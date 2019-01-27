@@ -6,48 +6,79 @@ import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.server.directives.RouteDirectives.complete
 import pomeranian.constants.{ErrorCode, Global}
-import pomeranian.models.requests.{UserRequestJsonProtocol, WeChatDecryptUserInfoRequest}
+import pomeranian.models.requests.{SaveContactsRequest, UserRequestJsonProtocol}
 import pomeranian.models.responses._
 import pomeranian.models.security.Role
-import pomeranian.services.WeChatServiceImpl
+import pomeranian.services.{UserServiceImpl, WeChatServiceImpl}
 
 import scala.util.{Failure, Success}
 
 
 
-class UserRoute(implicit system: ActorSystem) extends BaseRoute with UserRequestJsonProtocol with UserResponseJsonProtocol {
+class UserRoute(implicit system: ActorSystem) extends BaseRoute
+  with UserRequestJsonProtocol
+  with SimpleResponseJsonProtocol
+  with UserResponseJsonProtocol {
+
   val route: Route = {
     val version = "1"
 
-    val wechatService = new WeChatServiceImpl;
+    lazy val userService = new UserServiceImpl
 
     //authorizeAsync(hasPermission(Role.Basic)) {
     pathPrefix("user") {
-      pathPrefix("wechat") {
-        path("decryptUserInfo") {
-          pathEnd {
-            post {
-              entity(as[WeChatDecryptUserInfoRequest]) { requestData =>
-                val futureResult = wechatService.decryptUserInfo(requestData.code, requestData.encryptedData, requestData.iv)
-                onComplete(futureResult) {
-                  case Success(result) =>
-                    val res = if(result.isDefined) {
-                      WeChatDecryptUserInfoResponse(ErrorCode.Ok, "", version, result)
-                    } else {
-                      WeChatDecryptUserInfoResponse(ErrorCode.WeChatDecryptedUserInfoFailed, "", version, None)
-                    }
-                    complete(StatusCodes.OK, res)
-                  case Failure(f) =>
-                    // TODO: log
-                    println(f.getMessage)
-                    complete(StatusCodes.InternalServerError)
+      path("info") {
+        get {
+          parameters('id.as[Int]) { (userId) =>
+            val futureResult = userService.findUserByUserId(userId)
+            onComplete(futureResult) {
+              case Success(result) =>
+                if (result.isDefined) {
+                  val response = GetUserInfoResponse(ErrorCode.Ok, "", version, result)
+                  complete(StatusCodes.OK, response)
+                } else {
+                  val response = GetUserInfoResponse(
+                    ErrorCode.UserNotFound, s"User id: ${userId} not found ", version, None)
+                  complete(StatusCodes.NotFound, response)
                 }
 
-              }
+              case Failure(f) =>
+                // TODO: log
+
+                println(f.getMessage)
+                complete(StatusCodes.InternalServerError)
             }
           }
         }
-
+//      } ~ path("contacts") {
+//        get {
+//          parameters('userId.as[Int]) { (userId) =>
+//            val futureResult = userService.getContacts(userId)
+//            onComplete(futureResult) {
+//              case Success(result) =>
+//                val response = GetUserContactsResponse(ErrorCode.Ok, "", version, result)
+//                complete(StatusCodes.OK, response)
+//              case Failure(f) =>
+//                // TODO: log
+//                println(f.getMessage)
+//                complete(StatusCodes.InternalServerError)
+//            }
+//          }
+//        } ~ post {
+//          entity(as[SaveContactsRequest]) { requestData =>
+//            val futureResult = userService.saveContacts(requestData.userId, requestData.contacts)
+//            onComplete(futureResult) {
+//              case Success(true) =>
+//                complete(StatusCodes.OK, SimpleResponse(ErrorCode.Ok, "", version))
+//              case Success(false) =>
+//                complete(StatusCodes.OK, SimpleResponse(ErrorCode.SaveFailed, "Save contacts failed", version))
+//              case Failure(f) =>
+//                // TODO: log
+//                println(f.getMessage)
+//                complete(StatusCodes.InternalServerError)
+//            }
+//          }
+//        }
       }
 
 

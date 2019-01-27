@@ -12,9 +12,10 @@ import pomeranian.models.requests.{PublishTripRequest, TripRequestJsonProtocol}
 import pomeranian.models.responses.{GetTripDetailResponse, GetTripsResponse, PublishTripResponse, TripResponseJsonProtocol}
 import pomeranian.models.security.Role
 import pomeranian.models.trip.Trip
-import pomeranian.services.TripServiceImpl
+import pomeranian.services.{TripServiceImpl, UserServiceImpl}
 import pomeranian.utils.TimeUtil
 
+import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
 
@@ -23,6 +24,7 @@ class TripRoute extends BaseRoute with TripRequestJsonProtocol with TripResponse
     val version = "1"
     val numPerPage = 10
     val tripService = new TripServiceImpl
+    val userService = new UserServiceImpl
 
     //authorizeAsync(hasPermission(Role.Basic)) {
     pathPrefix("trip") {
@@ -85,7 +87,7 @@ class TripRoute extends BaseRoute with TripRequestJsonProtocol with TripResponse
                 val now = TimeUtil.timeStamp()
                 val trip = Trip(
                   0,
-                  1, // TODO:  Get user id from session
+                  requestData.userId,
                   requestData.depCityId,
                   requestData.arrCityId,
                   requestData.flightNo,
@@ -95,12 +97,15 @@ class TripRoute extends BaseRoute with TripRequestJsonProtocol with TripResponse
                   "CNY", // TODO: by default
                   new Timestamp(requestData.depTime),
                   new Timestamp(requestData.arrTime),
+                  requestData.contactTypeId,
+                  requestData.contactValue,
                   Option(requestData.memo),
                   Global.DbRecActive,
                   now,
                   now,
                 )
                 try {
+
                   val futureResult = tripService.createTrip(trip)
                   onComplete(futureResult) {
                     case Success(result) =>
@@ -115,6 +120,8 @@ class TripRoute extends BaseRoute with TripRequestJsonProtocol with TripResponse
                       println(f.getMessage)
                       complete(StatusCodes.InternalServerError)
                   }
+
+
                 } catch {
                   case ex: InvalidParameterException => {
                     // TODO: log
