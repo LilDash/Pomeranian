@@ -9,7 +9,7 @@ import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.server.directives.RouteDirectives.complete
 import pomeranian.constants.{ErrorCode, Global}
 import pomeranian.models.requests.{PublishTripRequest, TripRequestJsonProtocol}
-import pomeranian.models.responses.{GetTripDetailResponse, GetTripsResponse, PublishTripResponse, TripResponseJsonProtocol}
+import pomeranian.models.responses._
 import pomeranian.models.security.Role
 import pomeranian.models.trip.Trip
 import pomeranian.services.{TripServiceImpl, UserServiceImpl}
@@ -139,6 +139,23 @@ class TripRoute extends BaseRoute with TripRequestJsonProtocol with TripResponse
 
             }
 
+          }
+        }
+      } ~ path("mytrips") {
+        pathEnd {
+          get {
+            parameters('userId.as[Int], 'page.as[Int] ? 0) { (userId, page) =>
+              val futureResult = tripService.getTripsByUserId(userId, Math.max(page, 0)*numPerPage, numPerPage)
+              onComplete(futureResult) {
+                case Success(result) =>
+                  val response = GetMyTripsResponse(ErrorCode.Ok, "", version, result)
+                  complete(StatusCodes.OK, response)
+                case Failure(f) =>
+                  // TODO: log
+                  println(f.getMessage)
+                  complete(StatusCodes.InternalServerError)
+              }
+            }
           }
         }
       }

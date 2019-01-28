@@ -22,6 +22,7 @@ trait TripService {
                              offset: Int,
                              num: Int): Future[Seq[TripSummary]]
   def createTrip(trip: Trip): Future[Int]
+  def getTripsByUserId(userId: Int, offset: Int, num: Int): Future[Seq[TripInfo]]
 }
 
 class TripServiceImpl extends  TripService {
@@ -135,5 +136,9 @@ class TripServiceImpl extends  TripService {
       throw new InvalidParameterException("Illegal length of memo")
     }
     TripRepository.insert(trip)
+  }
+
+  override def getTripsByUserId(userId: Int, offset: Int, num: Int): Future[Seq[TripInfo]] = {
+    TripRepository.fetchTripsByUserId(userId, offset, num)
   }
 }

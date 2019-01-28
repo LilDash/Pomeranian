@@ -60,6 +60,12 @@ trait TripRepository {
                                  num: Int): Future[Seq[TripInfo]]
 
   def insert(t: Trip): Future[Int]
+
+  def fetchTripsByUserId(
+                        userId: Int,
+                        offset: Int,
+                        num: Int
+                        ): Future[Seq[TripInfo]]
 }
 
 object TripRepository extends TripRepository {
@@ -286,6 +292,24 @@ object TripRepository extends TripRepository {
         //Logger.error(ex.getCause.getMessage())
         0
     }
+  }
+
+  override def fetchTripsByUserId(userId: Int, offset: Int, num: Int): Future[Seq[TripInfo]] = {
+    val selectedTrips = trip.filter(_.userId === userId)
+      .filter(_.recStatus === Global.DbRecActive)
+    val join1 = (selectedTrips join city on (_.departureCityId === _.id)) join country on (_._2.countryId === _.id)
+    val join2 = (join1 join city on (_._1._1.arrivalCityId === _.id)) join country on (_._2.countryId === _.id)
+    val query = join2.sortBy { t => t._1._1._1._1.id.desc }
+      .drop(offset).take(num).result.map { rows =>
+      rows.collect {
+        case ((((t, depCity), depCountry), arrCity), arrCountry) =>
+          TripInfo(t.id, t.userId, t.departureCityId, depCity.displayName, depCountry.id, depCountry.displayName,
+            t.arrivalCityId, arrCity.displayName, arrCountry.id, arrCountry.displayName, t.flightNumber, t.totalCapacity,
+            t.remainingCapacity, t.capacityPrice, t.currency, t.departureTime, t.pickupTime, t.contactTypeId, t.contactValue,
+            t.memo, t.recCreatedWhen)
+      }
+    }
+    db.run(query)
   }
 
 }
