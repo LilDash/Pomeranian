@@ -3,6 +3,7 @@ package pomeranian.repositories
 import pomeranian.constants.Global
 import pomeranian.models.geo.{CityTableDef, CountryTableDef}
 import pomeranian.models.trip.{Trip, TripInfo, TripTableDef}
+import pomeranian.utils.TimeUtil
 import pomeranian.utils.database.MySqlDbConnection
 import slick.lifted.TableQuery
 import slick.jdbc.MySQLProfile.api._
@@ -66,6 +67,8 @@ trait TripRepository {
                         offset: Int,
                         num: Int
                         ): Future[Seq[TripInfo]]
+
+  def deactiveTrip(id: Int): Future[Int]
 }
 
 object TripRepository extends TripRepository {
@@ -310,6 +313,18 @@ object TripRepository extends TripRepository {
       }
     }
     db.run(query)
+  }
+
+  override def deactiveTrip(id: Int): Future[Int] = {
+    val action = trip
+      .filter(_.id === id)
+      .map(c => (c.recStatus, c.recUpdatedWhen))
+      .update((Global.DbRecNonactive, TimeUtil.timeStamp()))
+    db.run(action).map(res => res).recover {
+      case ex: Exception =>
+        //TODO: Logger.error(ex.getCause.getMessage())
+        0
+      }
   }
 
 }

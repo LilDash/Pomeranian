@@ -19,7 +19,7 @@ import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
 
-class TripRoute extends BaseRoute with TripRequestJsonProtocol with TripResponseJsonProtocol {
+class TripRoute extends BaseRoute with TripRequestJsonProtocol with SimpleResponseJsonProtocol with TripResponseJsonProtocol {
   val route: Route = {
     val version = "1"
     val numPerPage = 10
@@ -28,7 +28,25 @@ class TripRoute extends BaseRoute with TripRequestJsonProtocol with TripResponse
 
     //authorizeAsync(hasPermission(Role.Basic)) {
     pathPrefix("trip") {
-      path("detail") {
+      pathEnd {
+        delete {
+          parameters('userId.as[Int], 'tripId.as[Int]) { (userId, tripId) =>
+            val futureResult = tripService.deleteTrip(userId, tripId)
+            onComplete(futureResult) {
+              case Success(result) if result > 0 =>
+                val response = SimpleResponse(ErrorCode.Ok, "", version)
+                complete(StatusCodes.OK, response)
+              case Success(result) =>
+                val response = SimpleResponse(ErrorCode.DeleteTripFailed, "Delete trip failed", version)
+                complete(StatusCodes.OK, response)
+              case Failure(f) =>
+                // TODO: log
+                println(f.getMessage)
+                complete(StatusCodes.InternalServerError)
+            }
+          }
+        }
+      } ~ path("detail") {
         pathEnd {
           get {
             parameters('id.as[Int]) { (tripId) =>

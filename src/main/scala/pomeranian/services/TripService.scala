@@ -23,6 +23,7 @@ trait TripService {
                              num: Int): Future[Seq[TripSummary]]
   def createTrip(trip: Trip): Future[Int]
   def getTripsByUserId(userId: Int, offset: Int, num: Int): Future[Seq[TripInfo]]
+  def deleteTrip(userId: Int, tripId: Int): Future[Int]
 }
 
 class TripServiceImpl extends  TripService {
@@ -140,5 +141,18 @@ class TripServiceImpl extends  TripService {
 
   override def getTripsByUserId(userId: Int, offset: Int, num: Int): Future[Seq[TripInfo]] = {
     TripRepository.fetchTripsByUserId(userId, offset, num)
+  }
+
+  override def deleteTrip(userId: Int, tripId: Int): Future[Int] = {
+    TripRepository.fetchTripById(tripId).flatMap {
+      case trip: Some[TripInfo] =>
+        if (trip.get.userId == userId) {
+          TripRepository.deactiveTrip(tripId)
+        } else {
+          Future.successful(0)
+        }
+      case _ =>
+        Future.successful(0)
+    }
   }
 }

@@ -13,4 +13,5 @@ object ErrorCode {
   val TripNotFound = 3000
   val CreateTripFailed = 3001
   val ContactRequired = 3002
+  val DeleteTripFailed = 3003
 }
