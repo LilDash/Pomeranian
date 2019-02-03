@@ -9,7 +9,7 @@ import akka.http.scaladsl.server.directives.RouteDirectives.complete
 import akka.http.scaladsl.server.directives.PathDirectives.path
 import pomeranian.constants.{AuthType, ErrorCode}
 import pomeranian.models.login.MiniProgramLoginResultInfo
-import pomeranian.models.requests.{LoginRequestJsonProtocol, WeChatDecryptUserInfoRequest, WeChatMiniProgramLoginRequest}
+import pomeranian.models.requests.{LoginRequestJsonProtocol, WeChatMiniProgramLoginRequest}
 import pomeranian.models.responses.{AuthLoginBaseResponse, AuthResponseJsonProtocol, AuthWeChatMiniLoginResponse}
 import pomeranian.models.security.Role
 import pomeranian.models.user.UserInfo

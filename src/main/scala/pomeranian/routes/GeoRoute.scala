@@ -20,24 +20,22 @@ class GeoRoute extends BaseRoute with GeoResponseJsonProtocol {
     val numPerPage = 10
 
     pathPrefix("geo") {
-        //authorizeAsync(hasPermission(Role.Basic)) {
-        path("countrycity") {
-          pathEnd {
-            get {
-              val locationService = new LocationServiceImpl
-              val futureResult = locationService.getCountryCityCollection
-              onComplete(futureResult) {
-                case Success(result) =>
-                  val response = GetCountryCitiesResponse(ErrorCode.Ok, "", version, result)
-                  complete(StatusCodes.OK, response)
-                case Failure(_) =>
-                  // TODO : Log
-                  complete(StatusCodes.InternalServerError)
-              }
+      path("countrycity") {
+        pathEnd {
+          get {
+            val locationService = new LocationServiceImpl
+            val futureResult = locationService.getCountryCityCollection
+            onComplete(futureResult) {
+              case Success(result) =>
+                val response = GetCountryCitiesResponse(ErrorCode.Ok, "", version, result)
+                complete(StatusCodes.OK, response)
+              case Failure(_) =>
+                // TODO : Log
+                complete(StatusCodes.InternalServerError)
             }
           }
         }
-        // }
       }
     }
+  }
 }

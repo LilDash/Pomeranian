@@ -2,8 +2,9 @@ package pomeranian.utils.security
 
 import akka.http.scaladsl.model.HttpRequest
 import io.igl.jwt._
-import pomeranian.models.security.{AuthToken, Role}
+import pomeranian.models.security.{JwtAuthInfo, Role}
 import pomeranian.utils.{AppConfiguration, TimeUtil}
+
 import scala.util.Try
 
 class AuthorizationHandler {
@@ -23,11 +24,11 @@ class AuthorizationHandler {
     }
   }
 
-  def createToken(userId: String, role: Role): AuthToken = {
+  def createToken(userId: String, role: Role): JwtAuthInfo = {
     val expirationTime = TimeUtil.now/1000 + authValidTime
     val jwt = new DecodedJwt(jwtHeader, Seq(Iss(userId), Aud(role.name), Exp(expirationTime)))
     val token = jwt.encodedAndSigned(authSecretKey)
-    AuthToken(token, expirationTime)
+    JwtAuthInfo(token, expirationTime)
   }
 
   def getAuthToken(req: HttpRequest): String = {
