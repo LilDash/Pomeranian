@@ -18,6 +18,5 @@ class CountryTableDef(tag: Tag) extends Table[Country](tag, "country") {
     displayName,
     recStatus,
     recCreatedWhen,
-    recUpdatedWhen
-  ) <> (Country.tupled, Country.unapply)
+    recUpdatedWhen) <> (Country.tupled, Country.unapply)
 }

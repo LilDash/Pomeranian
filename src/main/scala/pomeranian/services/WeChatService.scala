@@ -4,13 +4,13 @@ import java.security.AlgorithmParameters
 import javax.crypto.Cipher
 
 import akka.actor.ActorSystem
-import akka.http.scaladsl.model.{HttpMethods, HttpRequest, Uri}
+import akka.http.scaladsl.model.{ HttpMethods, HttpRequest, Uri }
 import akka.http.scaladsl.unmarshalling.Unmarshal
-import pomeranian.utils.{AesCryptoUtil, AppConfiguration}
+import pomeranian.utils.{ AesCryptoUtil, AppConfiguration }
 import akka.http.scaladsl.Http
 import akka.stream.ActorMaterializer
 import io.igl.jwt.Algorithm
-import pomeranian.models.wechat.{WeChatApiResponseJsonProtocol, WeChatDecryptedUserInfo, WeChatDecryptedUserInfoJsonProtocol, WeChatJscode2SessionResponse}
+import pomeranian.models.wechat.{ WeChatApiResponseJsonProtocol, WeChatDecryptedUserInfo, WeChatDecryptedUserInfoJsonProtocol, WeChatJscode2SessionResponse }
 import spray.json._
 
 import scala.concurrent.ExecutionContext.Implicits.global

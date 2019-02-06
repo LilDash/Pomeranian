@@ -1,12 +1,11 @@
 package pomeranian.utils
 
-import java.security.{AlgorithmParameters, Security}
+import java.security.{ AlgorithmParameters, Security }
 import javax.crypto.Cipher
-import javax.crypto.spec.{IvParameterSpec, SecretKeySpec}
+import javax.crypto.spec.{ IvParameterSpec, SecretKeySpec }
 
 import org.apache.commons.codec.binary.Base64
 //import org.bouncycastle.jce.provider.BouncyCastleProvider
-
 
 object AesCryptoUtil {
 
@@ -19,7 +18,7 @@ object AesCryptoUtil {
     val parameters = AlgorithmParameters.getInstance("AES");
     parameters.init(new IvParameterSpec(ivBytes));
 
-//    Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
+    //    Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
 
     val cipher: Cipher = Cipher.getInstance("AES/CBC/PKCS5Padding")
     cipher.init(Cipher.DECRYPT_MODE, keySpec, parameters)

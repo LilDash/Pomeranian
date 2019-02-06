@@ -5,15 +5,13 @@ import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.server.directives.RouteDirectives.complete
-import pomeranian.constants.{ErrorCode, Global}
-import pomeranian.models.requests.{SaveContactsRequest, UserRequestJsonProtocol}
+import pomeranian.constants.{ ErrorCode, Global }
+import pomeranian.models.requests.{ SaveContactsRequest, UserRequestJsonProtocol }
 import pomeranian.models.responses._
 import pomeranian.models.security.Role
-import pomeranian.services.{UserServiceImpl, WeChatServiceImpl}
+import pomeranian.services.{ UserServiceImpl, WeChatServiceImpl }
 
-import scala.util.{Failure, Success}
-
-
+import scala.util.{ Failure, Success }
 
 class UserRoute(implicit system: ActorSystem) extends BaseRoute
   with UserRequestJsonProtocol
@@ -50,37 +48,36 @@ class UserRoute(implicit system: ActorSystem) extends BaseRoute
             }
           }
         }
-//      } ~ path("contacts") {
-//        get {
-//          parameters('userId.as[Int]) { (userId) =>
-//            val futureResult = userService.getContacts(userId)
-//            onComplete(futureResult) {
-//              case Success(result) =>
-//                val response = GetUserContactsResponse(ErrorCode.Ok, "", version, result)
-//                complete(StatusCodes.OK, response)
-//              case Failure(f) =>
-//                // TODO: log
-//                println(f.getMessage)
-//                complete(StatusCodes.InternalServerError)
-//            }
-//          }
-//        } ~ post {
-//          entity(as[SaveContactsRequest]) { requestData =>
-//            val futureResult = userService.saveContacts(requestData.userId, requestData.contacts)
-//            onComplete(futureResult) {
-//              case Success(true) =>
-//                complete(StatusCodes.OK, SimpleResponse(ErrorCode.Ok, "", version))
-//              case Success(false) =>
-//                complete(StatusCodes.OK, SimpleResponse(ErrorCode.SaveFailed, "Save contacts failed", version))
-//              case Failure(f) =>
-//                // TODO: log
-//                println(f.getMessage)
-//                complete(StatusCodes.InternalServerError)
-//            }
-//          }
-//        }
+        //      } ~ path("contacts") {
+        //        get {
+        //          parameters('userId.as[Int]) { (userId) =>
+        //            val futureResult = userService.getContacts(userId)
+        //            onComplete(futureResult) {
+        //              case Success(result) =>
+        //                val response = GetUserContactsResponse(ErrorCode.Ok, "", version, result)
+        //                complete(StatusCodes.OK, response)
+        //              case Failure(f) =>
+        //                // TODO: log
+        //                println(f.getMessage)
+        //                complete(StatusCodes.InternalServerError)
+        //            }
+        //          }
+        //        } ~ post {
+        //          entity(as[SaveContactsRequest]) { requestData =>
+        //            val futureResult = userService.saveContacts(requestData.userId, requestData.contacts)
+        //            onComplete(futureResult) {
+        //              case Success(true) =>
+        //                complete(StatusCodes.OK, SimpleResponse(ErrorCode.Ok, "", version))
+        //              case Success(false) =>
+        //                complete(StatusCodes.OK, SimpleResponse(ErrorCode.SaveFailed, "Save contacts failed", version))
+        //              case Failure(f) =>
+        //                // TODO: log
+        //                println(f.getMessage)
+        //                complete(StatusCodes.InternalServerError)
+        //            }
+        //          }
+        //        }
       }
-
 
     }
     // }

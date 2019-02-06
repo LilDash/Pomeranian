@@ -1,6 +1,7 @@
 package pomeranian.routes
 
-import akka.http.scaladsl.server.{RequestContext, Route}
+import akka.event.Logging
+import akka.http.scaladsl.server.{ RequestContext, Route }
 import pomeranian.models.security.Role
 import pomeranian.utils.security.AuthorizationHandler
 

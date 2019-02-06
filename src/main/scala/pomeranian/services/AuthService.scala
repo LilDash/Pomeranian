@@ -1,10 +1,10 @@
 package pomeranian.services
 
 import akka.actor.ActorSystem
-import pomeranian.constants.{AuthType, Global}
-import pomeranian.models.login.{LoginResultStatus, MiniProgramLoginResult, MiniProgramLoginResultInfo}
+import pomeranian.constants.{ AuthType, Global }
+import pomeranian.models.login.{ LoginResultStatus, MiniProgramLoginResult, MiniProgramLoginResultInfo }
 import pomeranian.models.security.Role
-import pomeranian.models.user.{User, UserInfo}
+import pomeranian.models.user.{ User, UserInfo }
 import pomeranian.models.wechat.WeChatDecryptedUserInfo
 import pomeranian.repositories.UserRepository
 import pomeranian.utils.TimeUtil

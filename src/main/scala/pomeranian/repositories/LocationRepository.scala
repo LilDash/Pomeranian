@@ -1,10 +1,10 @@
 package pomeranian.repositories
 
 import pomeranian.constants.Global
-import pomeranian.models.geo.{CityBrief, CityTableDef, CountryCities, CountryTableDef}
+import pomeranian.models.geo.{ CityBrief, CityTableDef, CountryCities, CountryTableDef }
 import pomeranian.utils.TimeUtil
 import pomeranian.utils.database.MySqlDbConnection
-import slick.lifted.{Rep, TableQuery}
+import slick.lifted.{ Rep, TableQuery }
 import slick.jdbc.MySQLProfile.api._
 
 import scala.collection.mutable
@@ -28,7 +28,7 @@ object LocationRepository extends LocationRepository {
     val query = city.filter(_.recStatus === Global.DbRecActive)
       .join(country.filter(_.recStatus === Global.DbRecActive))
       .on(_.countryId === _.id)
-      .result.map { rows  =>
+      .result.map { rows =>
         rows.collect {
           case (rowCity, rowCountry) =>
             val cityBrief = CityBrief(rowCity.id, rowCity.name, rowCity.displayName)
@@ -38,14 +38,13 @@ object LocationRepository extends LocationRepository {
                 rowCity.countryId,
                 rowCountry.name,
                 rowCountry.displayName,
-                cities = ListBuffer(cityBrief)
-              )
+                cities = ListBuffer(cityBrief))
               countryCityResult += newCountry
             } else {
               countryInfo.get.cities += cityBrief
             }
         }
-    }
+      }
     db.run(query).map { _ =>
       countryCityResult
     }

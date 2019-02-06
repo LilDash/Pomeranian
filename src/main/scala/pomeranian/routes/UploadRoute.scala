@@ -17,7 +17,6 @@ class UploadRoute extends BaseRoute with UploadResponseJsonProtocol {
 
   val route: Route = {
 
-
     pathPrefix("upload") {
       path("policy") {
         pathEnd {

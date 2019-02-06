@@ -6,12 +6,12 @@ import spray.json._
 
 import scala.collection.mutable.ListBuffer
 
-final case class CityBrief (
+final case class CityBrief(
   cityId: Int,
   cityName: String,
   cityDisplayName: String)
 
-final case class CountryCities (
+final case class CountryCities(
   countryId: Int,
   countryName: String,
   countryDisplayName: String,

@@ -3,7 +3,7 @@ package pomeranian.utils
 import com.typesafe.config.ConfigFactory
 
 object AppConfiguration {
-  private val config = ConfigFactory.load("config/application")
+  private val config = ConfigFactory.load()
 
   // Http
   private val httpConfig = config.getConfig("http")

@@ -1,7 +1,7 @@
 package pomeranian.models.responses
 
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
-import pomeranian.models.geo.{CountryCities, CountryCitiesJsonProtocol}
+import pomeranian.models.geo.{ CountryCities, CountryCitiesJsonProtocol }
 
 case class GetCountryCitiesResponse(
   errCode: Int,

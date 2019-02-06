@@ -3,30 +3,30 @@ package pomeranian.services
 import java.security.InvalidParameterException
 
 import pomeranian.constants.ErrorCode
-import pomeranian.models.trip.{Trip, TripDetail, TripInfo, TripSummary}
-import pomeranian.models.user.{User, UserContactInfo, UserInfo}
-import pomeranian.repositories.{TripRepository, UserRepository}
-import pomeranian.constants.{ContactType => ConstantContactType}
+import pomeranian.models.trip.{ Trip, TripDetail, TripInfo, TripSummary }
+import pomeranian.models.user.{ User, UserContactInfo, UserInfo }
+import pomeranian.repositories.{ TripRepository, UserRepository }
+import pomeranian.constants.{ ContactType => ConstantContactType }
 
-import scala.concurrent.{Await, Future}
+import scala.concurrent.{ Await, Future }
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 
 trait TripService {
   def getTripDetailById(id: Int): Future[Option[TripDetail]]
   def searchTripsByLocation(
-                             departureCountryId: Int,
-                             departureCityId: Int,
-                             arrivalCountryId: Int,
-                             arrivalCityId: Int,
-                             offset: Int,
-                             num: Int): Future[Seq[TripSummary]]
+    departureCountryId: Int,
+    departureCityId: Int,
+    arrivalCountryId: Int,
+    arrivalCityId: Int,
+    offset: Int,
+    num: Int): Future[Seq[TripSummary]]
   def createTrip(trip: Trip): Future[Int]
   def getTripsByUserId(userId: Int, offset: Int, num: Int): Future[Seq[TripInfo]]
   def deleteTrip(userId: Int, tripId: Int): Future[Int]
 }
 
-class TripServiceImpl extends  TripService {
+class TripServiceImpl extends TripService {
 
   override def getTripDetailById(id: Int): Future[Option[TripDetail]] = {
     TripRepository.fetchTripById(id).collect {
@@ -37,16 +37,16 @@ class TripServiceImpl extends  TripService {
   }
 
   override def searchTripsByLocation(
-                                      departureCountryId: Int,
-                                      departureCityId: Int,
-                                      arrivalCountryId: Int,
-                                      arrivalCityId: Int,
-                                      offset: Int,
-                                      num: Int): Future[Seq[TripSummary]] = {
+    departureCountryId: Int,
+    departureCityId: Int,
+    arrivalCountryId: Int,
+    arrivalCityId: Int,
+    offset: Int,
+    num: Int): Future[Seq[TripSummary]] = {
 
     (departureCountryId, departureCityId, arrivalCountryId, arrivalCityId) match {
       case (0, 0, 0, 0) => TripRepository.fetchAllTrips(offset, num)
-          .map(toTripSummary(_))
+        .map(toTripSummary(_))
       case (_, depCityId, _, arrCityId) if depCityId > 0 && arrCityId > 0 =>
         TripRepository.fetchTripsByDepartureCityAndArrivalCity(depCityId, arrCityId, offset, num)
           .map(toTripSummary(_))
@@ -103,12 +103,12 @@ class TripServiceImpl extends  TripService {
         UserInfo(0, "", "", 0, 0, None)
     }
 
-//    val futureUserContactInfo = UserRepository.fetchUserContactInfo(tripInfo.userId)
-//
-//    val result =
-//      Await.result(Future.sequence(Seq(futureUserInfo, futureUserContactInfo)), Duration.Inf)
-//
-//    TripDetail(tripInfo, result(0).asInstanceOf[UserInfo], result(1).asInstanceOf[Seq[UserContactInfo]])
+    //    val futureUserContactInfo = UserRepository.fetchUserContactInfo(tripInfo.userId)
+    //
+    //    val result =
+    //      Await.result(Future.sequence(Seq(futureUserInfo, futureUserContactInfo)), Duration.Inf)
+    //
+    //    TripDetail(tripInfo, result(0).asInstanceOf[UserInfo], result(1).asInstanceOf[Seq[UserContactInfo]])
 
     val result =
       Await.result(Future.sequence(Seq(futureUserInfo)), Duration.Inf)
@@ -123,14 +123,14 @@ class TripServiceImpl extends  TripService {
     if (trip.departureTime.after(trip.pickupTime)) {
       throw new InvalidParameterException("Invalid departure time and pickup time")
     }
-    if (!"^[0-9a-zA-Z]+$".r.pattern.matcher(trip.flightNumber).matches()){
+    if (!"^[0-9a-zA-Z]+$".r.pattern.matcher(trip.flightNumber).matches()) {
       throw new InvalidParameterException("Invalid flight number")
     }
     val availableContactTypeId = List(ConstantContactType.WeChatId) // support wechat only for now
     if (!availableContactTypeId.contains(trip.contactTypeId)) {
       throw new InvalidParameterException("Invalid contact type")
     }
-    if (!"^[-_0-9a-zA-Z]+$".r.pattern.matcher(trip.contactValue).matches()){
+    if (!"^[-_0-9a-zA-Z]+$".r.pattern.matcher(trip.contactValue).matches()) {
       throw new InvalidParameterException("Invalid contact value")
     }
     if (trip.memo.size > 200) {
