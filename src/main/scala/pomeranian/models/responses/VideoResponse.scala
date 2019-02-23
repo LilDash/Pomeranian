@@ -6,16 +6,14 @@ import pomeranian.models.video.{ VideoInfo, VideoJsonProtocol, VideoReviewDetail
 case class UploadVideoResponse(
   errCode: Int,
   errMsg: String,
-  version: String,
-  video: VideoInfo) extends BaseResponse(errCode, errMsg, version)
+  video: VideoInfo) extends BaseResponse(errCode, errMsg)
 
 case class GetVideoReviewPendingResponse(
   errCode: Int,
   errMsg: String,
-  version: String,
-  videoReviews: Seq[VideoReviewDetail]) extends BaseResponse(errCode, errMsg, version)
+  videoReviews: Seq[VideoReviewDetail]) extends BaseResponse(errCode, errMsg)
 
 trait VideoResponseJsonProtocol extends SprayJsonSupport with VideoJsonProtocol with VideoReviewJsonProtocol {
-  implicit val uploadVideoResponseFormat = jsonFormat4(UploadVideoResponse)
-  implicit val getVideoReviewPendingResponseFormat = jsonFormat4(GetVideoReviewPendingResponse)
+  implicit val uploadVideoResponseFormat = jsonFormat3(UploadVideoResponse)
+  implicit val getVideoReviewPendingResponseFormat = jsonFormat3(GetVideoReviewPendingResponse)
 }

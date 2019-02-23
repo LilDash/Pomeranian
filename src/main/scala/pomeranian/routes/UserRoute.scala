@@ -19,8 +19,6 @@ class UserRoute(implicit system: ActorSystem) extends BaseRoute
   with UserResponseJsonProtocol {
 
   val route: Route = {
-    val version = "1"
-
     lazy val userService = new UserServiceImpl
 
     //authorizeAsync(hasPermission(Role.Basic)) {
@@ -32,11 +30,11 @@ class UserRoute(implicit system: ActorSystem) extends BaseRoute
             onComplete(futureResult) {
               case Success(result) =>
                 if (result.isDefined) {
-                  val response = GetUserInfoResponse(ErrorCode.Ok, "", version, result)
+                  val response = GetUserInfoResponse(ErrorCode.Ok, "", result)
                   complete(StatusCodes.OK, response)
                 } else {
                   val response = GetUserInfoResponse(
-                    ErrorCode.UserNotFound, s"User id: ${userId} not found ", version, None)
+                    ErrorCode.UserNotFound, s"User id: ${userId} not found ", None)
                   complete(StatusCodes.NotFound, response)
                 }
 

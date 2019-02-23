@@ -1,10 +1,14 @@
 package pomeranian.services
 
 import akka.actor.ActorSystem
-import pomeranian.constants.{ AuthType, Global }
-import pomeranian.models.login.{ LoginResultStatus, MiniProgramLoginResult, MiniProgramLoginResultInfo }
+import org.slf4j.LoggerFactory
+import pomeranian.constants.{AuthType, ErrorCode, Global}
+import pomeranian.models.login.LoginResultStatus.LoginResultStatus
+import pomeranian.models.login.{LoginResultStatus, MiniProgramLoginResult, MiniProgramLoginResultInfo}
+import pomeranian.models.requests.WeChatMiniProgramLoginRequest
+import pomeranian.models.responses.AuthWeChatMiniLoginResponse
 import pomeranian.models.security.Role
-import pomeranian.models.user.{ User, UserInfo }
+import pomeranian.models.user.{User, UserInfo}
 import pomeranian.models.wechat.WeChatDecryptedUserInfo
 import pomeranian.repositories.UserRepository
 import pomeranian.utils.TimeUtil
@@ -14,45 +18,73 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 trait AuthService {
-  def loginWithWeChatMiniProgram(code: String, encryptedData: String, iv: String)(implicit system: ActorSystem): Future[MiniProgramLoginResult]
+  def loginWithWeChatMiniProgram(request: WeChatMiniProgramLoginRequest)(implicit system: ActorSystem): Future[AuthWeChatMiniLoginResponse]
 }
 
 class AuthServiceImpl extends AuthService {
-
+  lazy val logger = LoggerFactory.getLogger(this.getClass)
   lazy val weChatService = new WeChatServiceImpl
   lazy val userService = new UserServiceImpl
   lazy val authHandler = new AuthorizationHandler
 
-  override def loginWithWeChatMiniProgram(code: String, encryptedData: String, iv: String)(implicit system: ActorSystem): Future[MiniProgramLoginResult] = {
-    weChatService.decryptUserInfo(code, encryptedData, iv).flatMap {
+  override def loginWithWeChatMiniProgram(request: WeChatMiniProgramLoginRequest)(implicit system: ActorSystem): Future[AuthWeChatMiniLoginResponse] = {
+    val futureResult = weChatService.decryptUserInfo(request.code, request.encryptedData, request.iv).flatMap {
       case decrypted: Some[WeChatDecryptedUserInfo] =>
         val weChatUserInfo = decrypted.get
         userService.findUserByAuthType(AuthType.WeChatMiniProgram, weChatUserInfo.openId).flatMap {
           case userInfo: Some[UserInfo] =>
             val u = userInfo.get
-            val resultInfo = MiniProgramLoginResultInfo(u.id, u.username, u.nickname, u.avatar, u.rating, u.tripsNum, weChatUserInfo.openId)
-            val jwtInfo = authHandler.createToken(u.id.toString, Role.Basic)
-            Future.successful(MiniProgramLoginResult(LoginResultStatus.Success, Option(resultInfo), Option(jwtInfo)))
+            val result = buildMiniProgramLoginResult(u, weChatUserInfo)
+            Future.successful(result)
           case None =>
-            val time = TimeUtil.timeStamp()
-            val user = User(0, weChatUserInfo.openId, weChatUserInfo.nickName, 0, 0,
-              Option(weChatUserInfo.avatarUrl), Global.DbRecActive, time, time)
-            UserRepository.insertUserWithBinding(AuthType.WeChatMiniProgram, weChatUserInfo.openId, user).map { userId =>
-              val resultInfo = MiniProgramLoginResultInfo(userId, weChatUserInfo.openId,
-                weChatUserInfo.nickName, Option(weChatUserInfo.avatarUrl), user.rating, user.tripsNum, weChatUserInfo.openId)
-              val jwtInfo = authHandler.createToken(userId.toString, Role.Basic)
-              MiniProgramLoginResult(LoginResultStatus.Success, Option(resultInfo), Option(jwtInfo))
+            this.createUserWithAuthTypeWeChatMiniProgram(weChatUserInfo).map { user =>
+              buildMiniProgramLoginResult(user, weChatUserInfo)
             }.recover {
               case e =>
-                // TODO: log
-                println(e.getMessage)
-                MiniProgramLoginResult(LoginResultStatus.CreateUserFailed, None, None)
+                logger.error("Create user failed", e)
+                buildMiniProgramLoginFailureResult(LoginResultStatus.CreateUserFailed)
             }
         }
       case _ =>
-        // TODO: log
-        Future.successful(MiniProgramLoginResult(LoginResultStatus.DecryptWeChatUserInfoFailed, None, None))
+        logger.debug("Decrypt WeChatUserInfo failed")
+        Future.successful(buildMiniProgramLoginFailureResult(LoginResultStatus.DecryptWeChatUserInfoFailed))
+    }
+    buildMiniProgramLoginResponse(futureResult)
+  }
+
+  private def createUserWithAuthTypeWeChatMiniProgram(weChatUserInfo: WeChatDecryptedUserInfo): Future[User] = {
+    val time = TimeUtil.timeStamp()
+    val user = User(0, weChatUserInfo.openId, weChatUserInfo.nickName, 0, 0,
+      Option(weChatUserInfo.avatarUrl), Global.DbRecActive, time, time)
+    UserRepository.insertUserWithBinding(AuthType.WeChatMiniProgram, weChatUserInfo.openId, user).map { userId =>
+      user.copy(id = userId)
     }
   }
 
+  private def buildMiniProgramLoginResult(u: UserInfo, weChatUserInfo: WeChatDecryptedUserInfo): MiniProgramLoginResult = {
+    val resultInfo = MiniProgramLoginResultInfo(u.id, u.username, u.nickname, u.avatar, u.rating, u.tripsNum, weChatUserInfo.openId)
+    val jwtInfo = authHandler.createToken(u.id.toString, Role.Basic)
+    MiniProgramLoginResult(LoginResultStatus.Success, Option(resultInfo), Option(jwtInfo))
+  }
+
+  private def buildMiniProgramLoginResult(u: User, weChatUserInfo: WeChatDecryptedUserInfo): MiniProgramLoginResult = {
+    val resultInfo = MiniProgramLoginResultInfo(u.id, weChatUserInfo.openId,
+      weChatUserInfo.nickName, Option(weChatUserInfo.avatarUrl), u.rating, u.tripsNum, weChatUserInfo.openId)
+    val jwtInfo = authHandler.createToken(u.id.toString, Role.Basic)
+    MiniProgramLoginResult(LoginResultStatus.Success, Option(resultInfo), Option(jwtInfo))
+  }
+
+  private def buildMiniProgramLoginFailureResult(status: LoginResultStatus): MiniProgramLoginResult = {
+    MiniProgramLoginResult(status, None, None)
+  }
+
+  private def buildMiniProgramLoginResponse(futureResult: Future[MiniProgramLoginResult]): Future[AuthWeChatMiniLoginResponse] = {
+    futureResult.map { result =>
+      AuthWeChatMiniLoginResponse(ErrorCode.Ok, "", result)
+    }.recover {
+      case ex: Exception =>
+        logger.error("loginWithWeChatMiniProgram failure", ex)
+        throw ex
+    }
+  }
 }

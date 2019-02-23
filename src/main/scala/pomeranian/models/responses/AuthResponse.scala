@@ -7,20 +7,18 @@ import pomeranian.utils.CommonJsonProtocol
 case class AuthLoginBaseResponse(
   errCode: Int,
   errMsg: String,
-  version: String,
   token: String,
   expirationTime: Long,
-) extends BaseResponse(errCode, errMsg, version)
+) extends BaseResponse(errCode, errMsg)
 
 case class AuthWeChatMiniLoginResponse(
                                       errCode: Int,
                                       errMsg: String,
-                                      version: String,
                                       data: MiniProgramLoginResult,
-                                      ) extends BaseResponse(errCode, errMsg, version)
+                                      ) extends BaseResponse(errCode, errMsg)
 
 trait AuthResponseJsonProtocol extends SprayJsonSupport with LoginResultJsonProtocol with CommonJsonProtocol {
-  implicit val authLoginBaseResponseFormat = jsonFormat5(AuthLoginBaseResponse)
-  implicit val authWeChatMiniLoginResponseFormat = jsonFormat4(AuthWeChatMiniLoginResponse)
+  implicit val authLoginBaseResponseFormat = jsonFormat4(AuthLoginBaseResponse)
+  implicit val authWeChatMiniLoginResponseFormat = jsonFormat3(AuthWeChatMiniLoginResponse)
 }
 

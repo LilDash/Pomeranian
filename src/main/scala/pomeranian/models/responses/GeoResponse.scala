@@ -6,9 +6,8 @@ import pomeranian.models.geo.{ CountryCities, CountryCitiesJsonProtocol }
 case class GetCountryCitiesResponse(
   errCode: Int,
   errMsg: String,
-  version: String,
-  data: Seq[CountryCities]) extends BaseResponse(errCode, errMsg, version)
+  data: Seq[CountryCities]) extends BaseResponse(errCode, errMsg)
 
 trait GeoResponseJsonProtocol extends SprayJsonSupport with CountryCitiesJsonProtocol {
-  implicit val getCountryCitiesResponseFormat = jsonFormat4(GetCountryCitiesResponse)
+  implicit val getCountryCitiesResponseFormat = jsonFormat3(GetCountryCitiesResponse)
 }

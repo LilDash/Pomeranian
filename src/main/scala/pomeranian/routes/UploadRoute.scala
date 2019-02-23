@@ -13,8 +13,6 @@ import scala.util.{ Failure, Success }
 
 class UploadRoute extends BaseRoute with UploadResponseJsonProtocol {
 
-  val version = "1"
-
   val route: Route = {
 
     pathPrefix("upload") {
@@ -24,7 +22,7 @@ class UploadRoute extends BaseRoute with UploadResponseJsonProtocol {
             val uploadService = new UploadServiceImpl()
             val futureResult = uploadService.getOssUploadPolicy()
             onSuccess(futureResult) { result: OssUploadPolicy =>
-              val response = GetUploadPolicyResponse(ErrorCode.Ok, "", version, result)
+              val response = GetUploadPolicyResponse(ErrorCode.Ok, "", result)
               complete(StatusCodes.OK, response)
             }
           }
@@ -50,10 +48,10 @@ class UploadRoute extends BaseRoute with UploadResponseJsonProtocol {
               val futureResult = uploadService.saveUploadNotification(notification)
               onComplete(futureResult) {
                 case Success(result: Long) if result > 0 =>
-                  val response = SaveUploadNotificationResponse(ErrorCode.Ok, "", version, result)
+                  val response = SaveUploadNotificationResponse(ErrorCode.Ok, "", result)
                   complete(StatusCodes.OK, response)
                 case Success(result: Long) if result <= 0 =>
-                  val response = SaveUploadNotificationResponse(ErrorCode.SaveFailed, "Save notification failed", version, result)
+                  val response = SaveUploadNotificationResponse(ErrorCode.SaveFailed, "Save notification failed", result)
                   complete(StatusCodes.OK, response)
                 case Failure(e: IllegalArgumentException) =>
                   // TODO: log

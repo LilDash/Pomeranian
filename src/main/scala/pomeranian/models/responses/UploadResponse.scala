@@ -6,16 +6,14 @@ import pomeranian.models.{ OssJsonProtocol, OssUploadPolicy }
 case class GetUploadPolicyResponse(
   errCode: Int,
   errMsg: String,
-  version: String,
-  uploadPolicy: OssUploadPolicy) extends BaseResponse(errCode, errMsg, version)
+  uploadPolicy: OssUploadPolicy) extends BaseResponse(errCode, errMsg)
 
 case class SaveUploadNotificationResponse(
   errCode: Int,
   errMsg: String,
-  version: String,
-  id: Long) extends BaseResponse(errCode, errMsg, version)
+  id: Long) extends BaseResponse(errCode, errMsg)
 
 trait UploadResponseJsonProtocol extends SprayJsonSupport with OssJsonProtocol {
-  implicit val getUploadPolicyResponseFormat = jsonFormat4(GetUploadPolicyResponse)
-  implicit val saveUPloadNotificationResponseFormat = jsonFormat4(SaveUploadNotificationResponse)
+  implicit val getUploadPolicyResponseFormat = jsonFormat3(GetUploadPolicyResponse)
+  implicit val saveUPloadNotificationResponseFormat = jsonFormat3(SaveUploadNotificationResponse)
 }

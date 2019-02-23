@@ -5,9 +5,8 @@ import pomeranian.utils.CommonJsonProtocol
 
 case class SimpleResponse(
   errCode: Int,
-  errMsg: String,
-  version: String) extends BaseResponse(errCode, errMsg, version)
+  errMsg: String) extends BaseResponse(errCode, errMsg)
 
 trait SimpleResponseJsonProtocol extends SprayJsonSupport with CommonJsonProtocol {
-  implicit val simpleResponseFormat = jsonFormat3(SimpleResponse)
+  implicit val simpleResponseFormat = jsonFormat2(SimpleResponse)
 }

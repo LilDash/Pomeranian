@@ -6,30 +6,26 @@ import pomeranian.models.trip.{ TripDetail, TripInfo, TripJsonProtocol, TripSumm
 case class GetTripDetailResponse(
   errCode: Int,
   errMsg: String,
-  version: String,
-  data: Option[TripDetail]) extends BaseResponse(errCode, errMsg, version)
+  data: Option[TripDetail]) extends BaseResponse(errCode, errMsg)
 
 case class GetTripsResponse(
   errCode: Int,
   errMsg: String,
-  version: String,
-  data: Seq[TripSummary]) extends BaseResponse(errCode, errMsg, version)
+  data: Seq[TripSummary]) extends BaseResponse(errCode, errMsg)
 
 case class PublishTripResponse(
   errCode: Int,
   errMsg: String,
-  version: String,
-  data: Map[String, Int]) extends BaseResponse(errCode, errMsg, version)
+  data: Map[String, Int]) extends BaseResponse(errCode, errMsg)
 
 case class GetMyTripsResponse(
   errCode: Int,
   errMsg: String,
-  version: String,
-  data: Seq[TripInfo]) extends BaseResponse(errCode, errMsg, version)
+  data: Seq[TripInfo]) extends BaseResponse(errCode, errMsg)
 
 trait TripResponseJsonProtocol extends SprayJsonSupport with TripJsonProtocol {
-  implicit val getTripDetailResponseFormat = jsonFormat4(GetTripDetailResponse)
-  implicit val getTripsResponseFormat = jsonFormat4(GetTripsResponse)
-  implicit val publishTripResponseFormat = jsonFormat4(PublishTripResponse)
-  implicit val getMyTripsResponseFormat = jsonFormat4(GetMyTripsResponse)
+  implicit val getTripDetailResponseFormat = jsonFormat3(GetTripDetailResponse)
+  implicit val getTripsResponseFormat = jsonFormat3(GetTripsResponse)
+  implicit val publishTripResponseFormat = jsonFormat3(PublishTripResponse)
+  implicit val getMyTripsResponseFormat = jsonFormat3(GetMyTripsResponse)
 }
