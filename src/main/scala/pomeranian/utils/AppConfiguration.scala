@@ -19,12 +19,13 @@ object AppConfiguration {
   private val dbConfig = config.getConfig("db")
   val dbMysqlConfig = dbConfig.getConfig("mysql")
 
-  // OSS
-  private val ossConfig = config.getConfig("oss")
-  val ossEndpoint = ossConfig.getString("endpoint")
-  val ossAccessId = ossConfig.getString("accessId")
-  val ossAccessKey = ossConfig.getString("accessKey")
-  val ossBucket = ossConfig.getString("bucket")
+  // InfluxDB
+  val influxDbConfig = dbConfig.getConfig("influxDb")
+  val influxDbHost = influxDbConfig.getString("host")
+  val influxDbPort = influxDbConfig.getInt("port")
+  val influxDbUsername = influxDbConfig.getString("username")
+  val influxDbPassword = influxDbConfig.getString("password")
+  val influxDbName = influxDbConfig.getString("dbname")
 
   // Upload
   private val uploadConfig = config.getConfig("upload")

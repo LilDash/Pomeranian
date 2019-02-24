@@ -3,6 +3,7 @@ package pomeranian.services
 import java.security.InvalidParameterException
 import java.sql.Timestamp
 
+import akka.actor.ActorSystem
 import org.slf4j.LoggerFactory
 import pomeranian.constants.{ErrorCode, Global, ContactType => ConstantContactType}
 import pomeranian.models.trip.{Trip, TripDetail, TripInfo, TripSummary}
@@ -11,6 +12,7 @@ import pomeranian.repositories.{TripRepository, UserRepository}
 import pomeranian.models.requests.PublishTripRequest
 import pomeranian.models.responses._
 import pomeranian.utils.TimeUtil
+import pomeranian.utils.measurement.Measurer
 
 import scala.concurrent.{Await, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -30,7 +32,7 @@ trait TripService {
   def deleteTrip(userId: Int, tripId: Int): Future[SimpleResponse]
 }
 
-class TripServiceImpl extends TripService {
+class TripServiceImpl(implicit system: ActorSystem, measurer: Measurer)  extends TripService {
   lazy val logger = LoggerFactory.getLogger(this.getClass)
 
   override def getTripDetailById(id: Int): Future[GetTripDetailResponse] = {
@@ -39,6 +41,7 @@ class TripServiceImpl extends TripService {
         Option(toTripDetail(tripInfo.get))
       case _ => None
     }
+    measurer.measure("trip.getTripDetailById", futureResult)
     buildGetTripDetailByIdResponse(id, futureResult)
   }
 
@@ -84,6 +87,7 @@ class TripServiceImpl extends TripService {
           s"arrivalCountryId: $arrivalCountryId " +
           s"arrivalCityId: $arrivalCityId")
     }
+    measurer.measure("trip.searchTripsByLocation", futureResult)
     buildSearchTripsByLocationResponse(futureResult)
   }
 
@@ -158,11 +162,13 @@ class TripServiceImpl extends TripService {
     }
 
     val futureResult = TripRepository.insert(trip)
+    measurer.measure("trip.createTrip", futureResult)
     buildCreateTripResponse(futureResult)
   }
 
   override def getTripsByUserId(userId: Int, offset: Int, num: Int): Future[GetMyTripsResponse] = {
     val futureResult = TripRepository.fetchTripsByUserId(userId, offset, num)
+    measurer.measure("trip.getTripsByUserId", futureResult)
     buildGetMyTripsResponse(futureResult)
   }
 
@@ -177,6 +183,7 @@ class TripServiceImpl extends TripService {
       case _ =>
         Future.successful(0)
     }
+    measurer.measure("trip.deleteTrip", futureResult)
     buildDeleteTripResponse(futureResult)
   }
 

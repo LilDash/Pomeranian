@@ -19,11 +19,15 @@
         </encoder>
     </appender>
 
-    <logger name="akka" level="DEBUG" />
+    <logger name="akka" level="INFO" />
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
+    </root>
 
     <root level="DEBUG">
         <appender-ref ref="CONSOLE"/>
-        <appender-ref ref="FILE"/>
     </root>
 
 </configuration>

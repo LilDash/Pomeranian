@@ -12,23 +12,25 @@ import pomeranian.models.user.{User, UserInfo}
 import pomeranian.models.wechat.WeChatDecryptedUserInfo
 import pomeranian.repositories.UserRepository
 import pomeranian.utils.TimeUtil
+import pomeranian.utils.measurement.Measurer
 import pomeranian.utils.security.AuthorizationHandler
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 trait AuthService {
-  def loginWithWeChatMiniProgram(request: WeChatMiniProgramLoginRequest)(implicit system: ActorSystem): Future[AuthWeChatMiniLoginResponse]
+  def loginWithWeChatMiniProgram(request: WeChatMiniProgramLoginRequest)(implicit system: ActorSystem)
+  : Future[AuthWeChatMiniLoginResponse]
 }
 
-class AuthServiceImpl extends AuthService {
+class AuthServiceImpl(implicit system: ActorSystem, measurer: Measurer) extends AuthService {
   lazy val logger = LoggerFactory.getLogger(this.getClass)
   lazy val weChatService = new WeChatServiceImpl
   lazy val userService = new UserServiceImpl
   lazy val authHandler = new AuthorizationHandler
 
   override def loginWithWeChatMiniProgram(request: WeChatMiniProgramLoginRequest)(implicit system: ActorSystem): Future[AuthWeChatMiniLoginResponse] = {
-    val futureResult = weChatService.decryptUserInfo(request.code, request.encryptedData, request.iv).flatMap {
+    val futureResult = weChatService.decryptUserInfo(request.code, request.encryptedData, request.iv)(system).flatMap {
       case decrypted: Some[WeChatDecryptedUserInfo] =>
         val weChatUserInfo = decrypted.get
         userService.findUserByAuthType(AuthType.WeChatMiniProgram, weChatUserInfo.openId).flatMap {
@@ -49,6 +51,7 @@ class AuthServiceImpl extends AuthService {
         logger.debug("Decrypt WeChatUserInfo failed")
         Future.successful(buildMiniProgramLoginFailureResult(LoginResultStatus.DecryptWeChatUserInfoFailed))
     }
+    measurer.measure("auth.loginWithWeChatMiniProgram", futureResult)
     buildMiniProgramLoginResponse(futureResult)
   }
 

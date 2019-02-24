@@ -12,6 +12,7 @@ import ch.megard.akka.http.cors.scaladsl.settings.CorsSettings
 import pomeranian.routes._
 import pomeranian.services._
 import pomeranian.utils.AppConfiguration
+import pomeranian.utils.measurement.MeasurerImpl
 
 import scala.concurrent.duration._
 
@@ -31,6 +32,9 @@ trait RoutesHandler {
         complete(StatusCodes.Forbidden, s"Cross origin access is forbidden")
       }.result()
 
+  // Instantiate Measurer
+  implicit val measurer = new MeasurerImpl
+
   // Instantiate services
   val authService = new AuthServiceImpl
   val locationService = new LocationServiceImpl
@@ -39,7 +43,6 @@ trait RoutesHandler {
 
   //#all-routes
   lazy val authorizationRoute = new AuthRoute(authService)
-  lazy val uploadRoute = new UploadRoute()
   lazy val tripRoute = new TripRoute(tripService)
   lazy val geoRoute = new GeoRoute(locationService)
   lazy val userRoute = new UserRoute()
@@ -47,7 +50,6 @@ trait RoutesHandler {
   // routes allow CORS
   val corsRoute = cors(corsSetting) {
     authorizationRoute.route ~
-      uploadRoute.route ~
       tripRoute.route ~
       geoRoute.route ~
       userRoute.route

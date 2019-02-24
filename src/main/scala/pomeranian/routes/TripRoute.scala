@@ -1,5 +1,6 @@
 package pomeranian.routes
 
+import akka.actor.ActorSystem
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.server.directives.RouteDirectives.complete
@@ -8,9 +9,11 @@ import pomeranian.models.requests.{PublishTripRequest, TripRequestJsonProtocol}
 import pomeranian.models.responses._
 import pomeranian.models.security.Role
 import pomeranian.services.TripService
+import pomeranian.utils.measurement.Measurer
 
 
-class TripRoute(tripService: TripService) extends BaseRoute with TripRequestJsonProtocol with SimpleResponseJsonProtocol with TripResponseJsonProtocol {
+class TripRoute(tripService: TripService)(implicit system: ActorSystem, measurer: Measurer)
+  extends BaseRoute with TripRequestJsonProtocol with SimpleResponseJsonProtocol with TripResponseJsonProtocol {
   val route: Route = {
     val numPerPage = 10
 

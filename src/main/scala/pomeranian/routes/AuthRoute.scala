@@ -9,8 +9,9 @@ import pomeranian.http.Directives._
 import pomeranian.models.requests.{LoginRequestJsonProtocol, WeChatMiniProgramLoginRequest}
 import pomeranian.models.responses.AuthResponseJsonProtocol
 import pomeranian.services.AuthService
+import pomeranian.utils.measurement.Measurer
 
-class AuthRoute(authService: AuthService)(implicit system: ActorSystem)
+class AuthRoute(authService: AuthService)(implicit system: ActorSystem, measurer: Measurer)
   extends BaseRoute with LoginRequestJsonProtocol with AuthResponseJsonProtocol {
 
   val route: Route = {

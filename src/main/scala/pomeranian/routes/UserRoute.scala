@@ -5,15 +5,16 @@ import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.server.directives.RouteDirectives.complete
-import pomeranian.constants.{ ErrorCode, Global }
-import pomeranian.models.requests.{ SaveContactsRequest, UserRequestJsonProtocol }
+import pomeranian.constants.{ErrorCode, Global}
+import pomeranian.models.requests.{SaveContactsRequest, UserRequestJsonProtocol}
 import pomeranian.models.responses._
 import pomeranian.models.security.Role
-import pomeranian.services.{ UserServiceImpl, WeChatServiceImpl }
+import pomeranian.services.{UserServiceImpl, WeChatServiceImpl}
+import pomeranian.utils.measurement.Measurer
 
-import scala.util.{ Failure, Success }
+import scala.util.{Failure, Success}
 
-class UserRoute(implicit system: ActorSystem) extends BaseRoute
+class UserRoute(implicit system: ActorSystem, measurer: Measurer) extends BaseRoute
   with UserRequestJsonProtocol
   with SimpleResponseJsonProtocol
   with UserResponseJsonProtocol {
