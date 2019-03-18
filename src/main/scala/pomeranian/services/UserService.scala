@@ -1,10 +1,9 @@
 package pomeranian.services
 
-import pomeranian.constants.Global
+import pomeranian.constants.{ AuthType, Global, ContactType => ConstantContactType }
 import pomeranian.models.user._
 import pomeranian.repositories.UserRepository
 import pomeranian.utils.TimeUtil
-import pomeranian.constants.{ ContactType => ConstantContactType }
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future

@@ -10,23 +10,21 @@ import akka.http.scaladsl.unmarshalling.FromRequestUnmarshaller
 
 import scala.reflect.ClassTag
 
-
 object Directives extends RequestContextDirectives
-
 
 trait RequestContextDirectives {
   def handle[T: ClassTag](handler: T ⇒ ToResponseMarshallable)(implicit um: FromRequestUnmarshaller[T]): Route = {
-      entity(as[T]) { requestObj =>
-        try {
-          complete(handler(requestObj))
-        } catch {
-          case _: InvalidParameterException =>
-            complete(StatusCodes.BadRequest)
-          case _: IllegalArgumentException =>
-            complete(StatusCodes.BadRequest)
-          case _: Throwable =>
-            complete(StatusCodes.InternalServerError)
-        }
+    entity(as[T]) { requestObj =>
+      try {
+        complete(handler(requestObj))
+      } catch {
+        case _: InvalidParameterException =>
+          complete(StatusCodes.BadRequest)
+        case _: IllegalArgumentException =>
+          complete(StatusCodes.BadRequest)
+        case _: Throwable =>
+          complete(StatusCodes.InternalServerError)
       }
+    }
   }
 }

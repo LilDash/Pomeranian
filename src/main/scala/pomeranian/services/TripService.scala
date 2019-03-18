@@ -32,7 +32,7 @@ trait TripService {
   def deleteTrip(userId: Int, tripId: Int): Future[SimpleResponse]
 }
 
-class TripServiceImpl(implicit system: ActorSystem, measurer: Measurer)  extends TripService {
+class TripServiceImpl(botService: BotService)(implicit system: ActorSystem, measurer: Measurer)  extends TripService {
   lazy val logger = LoggerFactory.getLogger(this.getClass)
 
   override def getTripDetailById(id: Int): Future[GetTripDetailResponse] = {
@@ -96,7 +96,12 @@ class TripServiceImpl(implicit system: ActorSystem, measurer: Measurer)  extends
       val futureUserInfo = UserRepository.fetchUser(tripInfo.userId).collect {
         case user: Some[User] =>
           val u = user.get
-          UserInfo(u.id, u.username, u.nickname, u.rating, u.tripsNum, u.avatar)
+          val avatar = if (u.isBot && u.avatar.isDefined) {
+            Option(botService.buildBotAvatarUrl(u.avatar.get))
+          } else {
+            u.avatar
+          }
+          UserInfo(u.id, u.username, u.nickname, u.rating, u.tripsNum, avatar)
         case None =>
           UserInfo(0, "", "", 0, 0, None)
       }
@@ -109,7 +114,12 @@ class TripServiceImpl(implicit system: ActorSystem, measurer: Measurer)  extends
     val futureUserInfo = UserRepository.fetchUser(tripInfo.userId).collect {
       case user: Some[User] =>
         val u = user.get
-        UserInfo(u.id, u.username, u.nickname, u.rating, u.tripsNum, u.avatar)
+        val avatar = if (u.isBot && u.avatar.isDefined) {
+          Option(botService.buildBotAvatarUrl(u.avatar.get))
+        } else {
+          u.avatar
+        }
+        UserInfo(u.id, u.username, u.nickname, u.rating, u.tripsNum, avatar)
       case None =>
         UserInfo(0, "", "", 0, 0, None)
     }

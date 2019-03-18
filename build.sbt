@@ -6,7 +6,7 @@ lazy val root = (project in file(".")).
     inThisBuild(List(
       organization    := "0pla.net",
       scalaVersion    := "2.12.6",
-      version         := "1.0.0"
+      version         := "1.0.1"
     )),
     name := "pomeranian",
     libraryDependencies ++= Seq(

@@ -36,7 +36,7 @@ object UserRepository extends UserRepository {
       .result.headOption.map { rows =>
         rows.collect {
           case u =>
-            User(u.id, u.username, u.nickname, u.rating, u.tripsNum, u.avatar,
+            User(u.id, u.username, u.nickname, u.rating, u.tripsNum, u.avatar, u.isBot,
               u.recStatus, u.recCreatedWhen, u.recUpdatedWhen)
         }
       }

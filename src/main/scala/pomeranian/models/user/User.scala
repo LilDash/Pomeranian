@@ -12,6 +12,7 @@ final case class User (
                         rating: Int,
                         tripsNum: Int,
                         avatar: Option[String],
+                        isBot: Boolean,
                         recStatus: Int,
                         recCreatedWhen: Timestamp,
                         recUpdatedWhen: Timestamp,

@@ -5,12 +5,11 @@ import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.server.directives.RouteDirectives.complete
 import pomeranian.http.Directives._
-import pomeranian.models.requests.{PublishTripRequest, TripRequestJsonProtocol}
+import pomeranian.models.requests.{ PublishTripRequest, TripRequestJsonProtocol }
 import pomeranian.models.responses._
 import pomeranian.models.security.Role
 import pomeranian.services.TripService
 import pomeranian.utils.measurement.Measurer
-
 
 class TripRoute(tripService: TripService)(implicit system: ActorSystem, measurer: Measurer)
   extends BaseRoute with TripRequestJsonProtocol with SimpleResponseJsonProtocol with TripResponseJsonProtocol {
@@ -36,18 +35,19 @@ class TripRoute(tripService: TripService)(implicit system: ActorSystem, measurer
         } ~ path("search") {
           pathEnd {
             get {
-              parameters('page.as[Int] ? 0,
+              parameters(
+                'page.as[Int] ? 0,
                 'depCountryId.as[Int] ? 0,
                 'depCityId.as[Int] ? 0,
                 'arrCountryId.as[Int] ? 0,
                 'arrCityId.as[Int] ? 0) { (page, depCountryId, depCityId, arrCountryId, arrCityId) =>
-                complete(tripService.searchTripsByLocation(
-                  depCountryId,
-                  depCityId,
-                  arrCountryId,
-                  arrCityId,
-                  Math.max(page, 0)*numPerPage, numPerPage))
-              }
+                  complete(tripService.searchTripsByLocation(
+                    depCountryId,
+                    depCityId,
+                    arrCountryId,
+                    arrCityId,
+                    Math.max(page, 0) * numPerPage, numPerPage))
+                }
             }
           }
         } ~ path("publish") {
@@ -60,7 +60,7 @@ class TripRoute(tripService: TripService)(implicit system: ActorSystem, measurer
           pathEnd {
             get {
               parameters('userId.as[Int], 'page.as[Int] ? 0) { (userId, page) =>
-                complete(tripService.getTripsByUserId(userId, Math.max(page, 0)*numPerPage, numPerPage))
+                complete(tripService.getTripsByUserId(userId, Math.max(page, 0) * numPerPage, numPerPage))
               }
             }
           }

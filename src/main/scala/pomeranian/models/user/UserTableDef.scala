@@ -13,6 +13,7 @@ class UserTableDef(tag: Tag) extends Table[User](tag, "user") {
   def rating = column[Int]("rating")
   def tripsNum = column[Int]("trips_num")
   def avatar = column[Option[String]]("avatar")
+  def isBot = column[Boolean]("is_bot")
   def recStatus = column[Int]("rec_status")
   def recCreatedWhen = column[Timestamp]("rec_created_when")
   def recUpdatedWhen = column[Timestamp]("rec_updated_when")
@@ -24,6 +25,7 @@ class UserTableDef(tag: Tag) extends Table[User](tag, "user") {
     rating,
     tripsNum,
     avatar,
+    isBot,
     recStatus,
     recCreatedWhen,
     recUpdatedWhen,

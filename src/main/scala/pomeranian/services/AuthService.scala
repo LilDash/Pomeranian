@@ -2,13 +2,13 @@ package pomeranian.services
 
 import akka.actor.ActorSystem
 import org.slf4j.LoggerFactory
-import pomeranian.constants.{AuthType, ErrorCode, Global}
+import pomeranian.constants.{ AuthType, ErrorCode, Global }
 import pomeranian.models.login.LoginResultStatus.LoginResultStatus
-import pomeranian.models.login.{LoginResultStatus, MiniProgramLoginResult, MiniProgramLoginResultInfo}
+import pomeranian.models.login.{ LoginResultStatus, MiniProgramLoginResult, MiniProgramLoginResultInfo }
 import pomeranian.models.requests.WeChatMiniProgramLoginRequest
 import pomeranian.models.responses.AuthWeChatMiniLoginResponse
 import pomeranian.models.security.Role
-import pomeranian.models.user.{User, UserInfo}
+import pomeranian.models.user.{ User, UserInfo }
 import pomeranian.models.wechat.WeChatDecryptedUserInfo
 import pomeranian.repositories.UserRepository
 import pomeranian.utils.TimeUtil
@@ -19,8 +19,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 trait AuthService {
-  def loginWithWeChatMiniProgram(request: WeChatMiniProgramLoginRequest)(implicit system: ActorSystem)
-  : Future[AuthWeChatMiniLoginResponse]
+  def loginWithWeChatMiniProgram(request: WeChatMiniProgramLoginRequest)(implicit system: ActorSystem): Future[AuthWeChatMiniLoginResponse]
 }
 
 class AuthServiceImpl(implicit system: ActorSystem, measurer: Measurer) extends AuthService {
@@ -58,7 +57,7 @@ class AuthServiceImpl(implicit system: ActorSystem, measurer: Measurer) extends 
   private def createUserWithAuthTypeWeChatMiniProgram(weChatUserInfo: WeChatDecryptedUserInfo): Future[User] = {
     val time = TimeUtil.timeStamp()
     val user = User(0, weChatUserInfo.openId, weChatUserInfo.nickName, 0, 0,
-      Option(weChatUserInfo.avatarUrl), Global.DbRecActive, time, time)
+      Option(weChatUserInfo.avatarUrl), false, Global.DbRecActive, time, time)
     UserRepository.insertUserWithBinding(AuthType.WeChatMiniProgram, weChatUserInfo.openId, user).map { userId =>
       user.copy(id = userId)
     }

@@ -4,7 +4,7 @@ import akka.actor.ActorSystem
 import akka.event.Logging
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives._
-import akka.http.scaladsl.server.{RejectionHandler, Route}
+import akka.http.scaladsl.server.{ RejectionHandler, Route }
 import akka.util.Timeout
 import ch.megard.akka.http.cors.javadsl.CorsRejection
 import ch.megard.akka.http.cors.scaladsl.CorsDirectives._
@@ -38,21 +38,24 @@ trait RoutesHandler {
   // Instantiate services
   val authService = new AuthServiceImpl
   val locationService = new LocationServiceImpl
-  val tripService = new TripServiceImpl
-
+  val userService = new UserServiceImpl
+  val botService = new BotServiceImpl(userService)
+  val tripService = new TripServiceImpl(botService)
 
   //#all-routes
   lazy val authorizationRoute = new AuthRoute(authService)
   lazy val tripRoute = new TripRoute(tripService)
   lazy val geoRoute = new GeoRoute(locationService)
   lazy val userRoute = new UserRoute()
+  lazy val botRoute = new BotRoute(botService)
 
   // routes allow CORS
   val corsRoute = cors(corsSetting) {
     authorizationRoute.route ~
       tripRoute.route ~
       geoRoute.route ~
-      userRoute.route
+      userRoute.route ~
+      botRoute.route
   }
 
   lazy val routes: Route = {

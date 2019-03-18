@@ -6,7 +6,7 @@ import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.server.directives.MethodDirectives.post
 import akka.http.scaladsl.server.directives.PathDirectives.path
 import pomeranian.http.Directives._
-import pomeranian.models.requests.{LoginRequestJsonProtocol, WeChatMiniProgramLoginRequest}
+import pomeranian.models.requests.{ LoginRequestJsonProtocol, WeChatMiniProgramLoginRequest }
 import pomeranian.models.responses.AuthResponseJsonProtocol
 import pomeranian.services.AuthService
 import pomeranian.utils.measurement.Measurer

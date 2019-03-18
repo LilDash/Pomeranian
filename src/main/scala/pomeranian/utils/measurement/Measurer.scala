@@ -1,9 +1,9 @@
 package pomeranian.utils.measurement
 
 import com.paulgoldbaum.influxdbclient.Parameter.Precision
-import com.paulgoldbaum.influxdbclient.{InfluxDB, Point}
+import com.paulgoldbaum.influxdbclient.{ InfluxDB, Point }
 import org.slf4j.LoggerFactory
-import pomeranian.utils.{AppConfiguration, TimeUtil}
+import pomeranian.utils.{ AppConfiguration, TimeUtil }
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -24,10 +24,9 @@ class MeasurerImpl extends Measurer {
   val database = influxDb.selectDatabase(AppConfiguration.influxDbName)
   lazy val logger = LoggerFactory.getLogger(this.getClass)
 
-
-//  def closeConnection() = {
-//    database.close()
-//  }
+  //  def closeConnection() = {
+  //    database.close()
+  //  }
 
   override def send(metricName: String, value: Any, tags: MetricTags): Unit = {
     var point = Point(s"${metricNamePrefix}${metricName}".toLowerCase, TimeUtil.now())
@@ -40,7 +39,8 @@ class MeasurerImpl extends Measurer {
       case _ => throw new IllegalArgumentException(s"Unsupported value type: ${value}")
     }
     for ((k, v) <- tags) point.addTag(k, v)
-    database.write(point,
+    database.write(
+      point,
       precision = Precision.MILLISECONDS).recover {
       case ex: Exception =>
         logger.error("Measurer send metric failed", ex)
