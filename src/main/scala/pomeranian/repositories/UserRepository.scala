@@ -1,7 +1,7 @@
 package pomeranian.repositories
 
-import pomeranian.constants.{ AuthType, Global }
-import pomeranian.models.user._
+import pomeranian.constants.Global
+import pomeranian.models.user.{ UserTableDef, _ }
 import pomeranian.utils.TimeUtil
 import pomeranian.utils.database.MySqlDbConnection
 import slick.lifted.TableQuery
@@ -20,6 +20,8 @@ trait UserRepository {
   def insertUserWithBinding(authType: Int, username: String, user: User): Future[Int]
 
   //  def saveUserContact(userContact: UserContact): Future[Int]
+
+  def increaseTripsNum(userId: Int): Future[Int]
 }
 
 object UserRepository extends UserRepository {
@@ -110,4 +112,14 @@ object UserRepository extends UserRepository {
   //      }
   //    }
   //  }
+
+  override def increaseTripsNum(userId: Int): Future[Int] = {
+    val time = TimeUtil.timeStamp()
+    val tableName = users.baseTableRow.tableName
+    val sql = sqlu"UPDATE user SET trips_num=trips_num+1, rec_updated_when=${time} WHERE id=${userId};"
+    db.run(sql).map(ret => ret).recover {
+      case ex: Exception =>
+        0
+    }
+  }
 }

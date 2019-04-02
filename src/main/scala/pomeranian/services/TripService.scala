@@ -172,6 +172,7 @@ class TripServiceImpl(botService: BotService)(implicit system: ActorSystem, meas
     }
 
     val futureResult = TripRepository.insert(trip)
+    UserRepository.increaseTripsNum(trip.userId)
     measurer.measure("trip.createTrip", futureResult)
     buildCreateTripResponse(futureResult)
   }
