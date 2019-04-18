@@ -22,6 +22,8 @@ trait UserRepository {
   //  def saveUserContact(userContact: UserContact): Future[Int]
 
   def increaseTripsNum(userId: Int): Future[Int]
+
+  def decreaseTripsNum(userId: Int): Future[Int]
 }
 
 object UserRepository extends UserRepository {
@@ -115,8 +117,16 @@ object UserRepository extends UserRepository {
 
   override def increaseTripsNum(userId: Int): Future[Int] = {
     val time = TimeUtil.timeStamp()
-    val tableName = users.baseTableRow.tableName
     val sql = sqlu"UPDATE user SET trips_num=trips_num+1, rec_updated_when=${time} WHERE id=${userId};"
+    db.run(sql).map(ret => ret).recover {
+      case ex: Exception =>
+        0
+    }
+  }
+
+  override def decreaseTripsNum(userId: Int): Future[Int] = {
+    val time = TimeUtil.timeStamp()
+    val sql = sqlu"UPDATE user SET trips_num=trips_num-1, rec_updated_when=${time} WHERE id=${userId};"
     db.run(sql).map(ret => ret).recover {
       case ex: Exception =>
         0

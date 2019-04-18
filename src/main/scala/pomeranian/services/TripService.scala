@@ -136,7 +136,7 @@ class TripServiceImpl(botService: BotService)(implicit system: ActorSystem, meas
       request.userId,
       request.depCityId,
       request.arrCityId,
-      request.flightNo,
+      "", // request.flightNo,
       request.totalCapacity,
       request.remainingCapacity,
       request.capacityPrice,
@@ -157,9 +157,9 @@ class TripServiceImpl(botService: BotService)(implicit system: ActorSystem, meas
     if (trip.departureTime.after(trip.pickupTime)) {
       throw new InvalidParameterException("Invalid departure time and pickup time")
     }
-    if (!"^[0-9a-zA-Z]+$".r.pattern.matcher(trip.flightNumber).matches()) {
-      throw new InvalidParameterException("Invalid flight number")
-    }
+//    if (!"^[0-9a-zA-Z]+$".r.pattern.matcher(trip.flightNumber).matches()) {
+//      throw new InvalidParameterException("Invalid flight number")
+//    }
     val availableContactTypeId = List(ConstantContactType.WeChatId) // support wechat only for now
     if (!availableContactTypeId.contains(trip.contactTypeId)) {
       throw new InvalidParameterException("Invalid contact type")
@@ -188,6 +188,7 @@ class TripServiceImpl(botService: BotService)(implicit system: ActorSystem, meas
       case trip: Some[TripInfo] =>
         if (trip.get.userId == userId) {
           TripRepository.deactiveTrip(tripId)
+          UserRepository.decreaseTripsNum(userId)
         } else {
           Future.successful(0)
         }
